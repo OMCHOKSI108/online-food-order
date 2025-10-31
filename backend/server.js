@@ -9,6 +9,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import restaurantRoutes from "./routes/restaurantRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 // Initialize app
 const app = express();
@@ -27,10 +28,11 @@ connectDB();
 app.use("/api/auth", authRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Default route
 app.get("/", (req, res) => {
-  res.send(" Online Food Ordering System API is running...");
+  res.send("🍔 Online Food Ordering System API is running...");
 });
 
 // Start server
