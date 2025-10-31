@@ -1,0 +1,371 @@
+# Online Food Ordering System - Project Information
+
+## Project Overview
+This is a full-stack web application for an online food ordering system. It allows users to browse restaurants, view menus, place orders, and manage their accounts. The system includes user authentication, restaurant management, order tracking, and an admin panel.
+
+## Technology Stack
+
+### Backend
+- **Runtime**: Node.js with ES6 modules
+- **Framework**: Express.js
+- **Database**: MongoDB with Mongoose ODM
+- **Authentication**: JWT (JSON Web Tokens) with bcrypt for password hashing
+- **CORS**: Enabled for cross-origin requests
+- **Development**: Nodemon for hot reloading
+
+### Frontend
+- **Framework**: React 19.2.0
+- **Build Tool**: Vite
+- **Routing**: React Router DOM v7.9.5
+- **HTTP Client**: Axios
+- **Styling**: Bootstrap 5.3.8
+- **Testing**: Jest with React Testing Library
+
+## Project Structure
+
+### Backend Structure
+```
+backend/
+├── config/
+│   └── db.js              # MongoDB connection
+├── models/
+│   ├── User.js            # User schema (name, email, password, role)
+│   ├── Restaurant.js      # Restaurant schema (name, description, address, image)
+│   ├── FoodItem.js        # Food item schema (name, description, price, image, restaurant)
+│   └── Order.js           # Order schema (user, items, total, status)
+├── routes/
+│   ├── authRoutes.js      # Authentication endpoints (/register, /login, /me)
+│   ├── restaurantRoutes.js # Restaurant endpoints (/restaurants, /:id/menu)
+│   └── orderRoutes.js     # Order endpoints (/orders)
+├── .env                   # Environment variables (MONGO_URI, JWT_SECRET, PORT)
+├── package.json           # Dependencies and scripts
+└── server.js              # Main server file with middleware and route setup
+```
+
+### Frontend Structure
+```
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── Register.js     # User registration form
+│   │   ├── Login.js        # User login form
+│   │   ├── Dashboard.js    # User dashboard
+│   │   ├── Restaurants.js  # Restaurant listing
+│   │   ├── Menu.js         # Restaurant menu display
+│   │   ├── Cart.js         # Shopping cart component
+│   │   ├── Orders.js       # Order history
+│   │   └── AdminPanel.js   # Admin management interface
+│   ├── App.jsx             # Main app component (currently default Vite template)
+│   ├── main.jsx            # App entry point
+│   └── index.css           # Global styles
+├── public/                 # Static assets
+├── package.json            # Dependencies and scripts
+└── vite.config.js          # Vite configuration
+```
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `GET /api/auth/me` - Get user profile (requires JWT token)
+
+### Restaurants
+- `GET /api/restaurants` - Get all restaurants
+- `GET /api/restaurants/:id/menu` - Get menu for specific restaurant
+
+### Orders
+- `POST /api/orders` - Place new order (requires JWT token)
+- `GET /api/orders` - Get user's order history (requires JWT token)
+
+## Data Models
+
+### User
+- name: String (required)
+- email: String (required, unique)
+- password: String (required, hashed)
+- role: String (enum: "user", "admin", default: "user")
+
+### Restaurant
+- name: String (required)
+- description: String
+- address: String
+- image: String
+
+### FoodItem
+- name: String (required)
+- description: String
+- price: Number
+- image: String
+- restaurant: ObjectId (reference to Restaurant)
+
+### Order
+- user: ObjectId (reference to User)
+- items: Array of { foodItem: ObjectId, quantity: Number }
+- total: Number
+- status: String (default: "Pending")
+
+## Current State
+- Backend is fully implemented with authentication, restaurant/menu management, and order processing
+- Frontend has component files created but App.jsx is still the default Vite template
+- Components are not integrated into the main app yet
+- No state management implemented in frontend
+- No routing setup in frontend
+
+## Proposed Frontend Architecture
+
+### Recommended Architecture: Component-Based with State Management
+
+#### Folder Structure
+```
+frontend/src/
+├── components/
+│   ├── common/            # Reusable components
+│   │   ├── Header.js
+│   │   ├── Footer.js
+│   │   ├── LoadingSpinner.js
+│   │   └── ErrorMessage.js
+│   ├── auth/              # Authentication components
+│   │   ├── Login.js
+│   │   └── Register.js
+│   ├── restaurant/        # Restaurant-related components
+│   │   ├── RestaurantList.js
+│   │   ├── RestaurantCard.js
+│   │   └── Menu.js
+│   ├── order/             # Order-related components
+│   │   ├── Cart.js
+│   │   ├── OrderHistory.js
+│   │   └── OrderSummary.js
+│   ├── admin/             # Admin components
+│   │   └── AdminPanel.js
+│   └── dashboard/         # Dashboard components
+│       └── Dashboard.js
+├── pages/                 # Page-level components
+│   ├── Home.js
+│   ├── Restaurants.js
+│   ├── Menu.js
+│   ├── Cart.js
+│   ├── Orders.js
+│   └── Admin.js
+├── context/               # React Context for state management
+│   ├── AuthContext.js
+│   ├── CartContext.js
+│   └── RestaurantContext.js
+├── hooks/                 # Custom hooks
+│   ├── useAuth.js
+│   ├── useCart.js
+│   └── useApi.js
+├── services/              # API service functions
+│   ├── authService.js
+│   ├── restaurantService.js
+│   └── orderService.js
+├── utils/                 # Utility functions
+│   ├── api.js
+│   └── constants.js
+├── App.js                 # Main app with routing
+├── index.js               # App entry point
+└── styles/                # Stylesheets
+    ├── main.css
+    └── components.css
+```
+
+#### Key Architectural Decisions
+
+1. **State Management**: Use React Context API for global state (auth, cart)
+   - AuthContext: Handle user authentication state and token management
+   - CartContext: Manage shopping cart items and totals
+   - RestaurantContext: Cache restaurant and menu data
+
+2. **Routing**: React Router with protected routes
+   - Public routes: /, /login, /register
+   - Protected routes: /dashboard, /restaurants, /cart, /orders
+   - Admin routes: /admin (role-based access)
+
+3. **API Layer**: Centralized API service functions
+   - Axios interceptors for JWT token handling
+   - Error handling and response transformation
+   - Base URL configuration
+
+4. **Component Organization**: Feature-based folder structure
+   - Group related components together
+   - Separate page components from reusable components
+   - Custom hooks for business logic
+
+5. **Styling**: Bootstrap with custom CSS
+   - Use Bootstrap utilities and components
+   - Custom styles for branding and specific components
+   - Responsive design principles
+
+#### Implementation Plan
+
+1. **Setup Routing and Layout**
+   - Install and configure React Router
+   - Create layout components (Header, Footer)
+   - Implement protected route wrapper
+
+2. **Implement Authentication Flow**
+   - Create AuthContext and useAuth hook
+   - Update Login/Register components
+   - Add token persistence and auto-login
+
+3. **Build Restaurant Features**
+   - Restaurant listing with search/filter
+   - Menu display with add-to-cart functionality
+   - Restaurant details page
+
+4. **Implement Cart and Ordering**
+   - CartContext for cart management
+   - Cart page with item management
+   - Order placement and confirmation
+
+5. **Add Order Management**
+   - Order history display
+   - Order status tracking
+   - Order details view
+
+6. **Admin Panel**
+   - Restaurant management
+   - Order management
+   - User management (if needed)
+
+## Proposed Backend Architecture
+
+### Recommended Architecture: RESTful API with Service Layer
+
+#### Enhanced Folder Structure
+```
+backend/
+├── config/
+│   ├── db.js              # Database connection
+│   └── config.js          # App configuration
+├── controllers/           # Request handlers
+│   ├── authController.js
+│   ├── restaurantController.js
+│   └── orderController.js
+├── services/              # Business logic layer
+│   ├── authService.js
+│   ├── restaurantService.js
+│   └── orderService.js
+├── middleware/            # Custom middleware
+│   ├── auth.js            # JWT authentication middleware
+│   ├── validation.js      # Input validation
+│   └── errorHandler.js    # Error handling
+├── models/                # Data models (existing)
+├── routes/                # Route definitions (existing)
+├── utils/                 # Utility functions
+│   ├── jwt.js
+│   └── validationSchemas.js
+├── tests/                 # Unit and integration tests
+│   ├── controllers/
+│   ├── services/
+│   └── integration/
+├── .env                   # Environment variables
+├── package.json
+└── server.js              # Main server file
+```
+
+#### Key Architectural Improvements
+
+1. **Controller Layer**: Separate request handling from business logic
+   - Parse request parameters
+   - Call appropriate service methods
+   - Format and return responses
+   - Handle HTTP-specific concerns
+
+2. **Service Layer**: Business logic and data operations
+   - User registration/login logic
+   - Restaurant and menu management
+   - Order processing and validation
+   - Data transformation and calculations
+
+3. **Middleware Enhancements**:
+   - JWT authentication middleware
+   - Input validation middleware (using Joi or similar)
+   - Error handling middleware
+   - Logging middleware
+
+4. **Validation**: Input validation schemas
+   - User input validation
+   - Data integrity checks
+   - Sanitization of inputs
+
+5. **Error Handling**: Centralized error management
+   - Custom error classes
+   - Consistent error response format
+   - Logging of errors
+
+6. **Testing**: Unit and integration tests
+   - Controller tests
+   - Service layer tests
+   - API integration tests
+
+#### Implementation Plan
+
+1. **Refactor Routes to Controllers**
+   - Move route handlers to controller files
+   - Implement proper error handling in controllers
+   - Add input validation
+
+2. **Create Service Layer**
+   - Extract business logic from controllers
+   - Implement data access patterns
+   - Add business rule validation
+
+3. **Add Middleware**
+   - Authentication middleware
+   - Validation middleware
+   - Error handling middleware
+
+4. **Database Improvements**
+   - Add indexes for performance
+   - Implement data validation at schema level
+   - Add database transactions for order placement
+
+5. **Add Testing**
+   - Unit tests for services
+   - Integration tests for API endpoints
+   - Test database setup
+
+6. **Security Enhancements**
+   - Rate limiting
+   - Input sanitization
+   - CORS configuration
+   - Helmet.js for security headers
+
+#### Additional Features to Consider
+- Email notifications for orders
+- Payment integration (Stripe, PayPal)
+- Real-time order status updates (WebSocket/Socket.io)
+- Image upload for restaurants and food items
+- Search and filtering for restaurants
+- User reviews and ratings
+- Admin dashboard with analytics
+- API documentation (Swagger/OpenAPI)
+- Docker containerization
+- CI/CD pipeline setup
+
+## Development Setup
+
+### Backend Setup
+1. Install dependencies: `npm install`
+2. Create `.env` file with:
+   ```
+   MONGO_URI=mongodb://localhost:27017/food-ordering
+   JWT_SECRET=your-secret-key
+   PORT=5000
+   ```
+3. Start MongoDB
+4. Run development server: `npm run dev`
+
+### Frontend Setup
+1. Install dependencies: `npm install`
+2. Start development server: `npm run dev`
+3. Open http://localhost:5173
+
+## Deployment Considerations
+- Environment-specific configurations
+- Database migration scripts
+- Build optimization for production
+- CDN for static assets
+- Monitoring and logging setup
+- Backup strategies for database
