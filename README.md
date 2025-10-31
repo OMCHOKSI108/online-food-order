@@ -40,7 +40,7 @@ The system should support three types of users — Admin, Restaurant, and Custom
 All prices, totals, and payment details should be shown in Indian Rupees (₹).
 The app should simulate payments (success/failure) and support refund logic for cancelled orders.
 
-👑 Admin Features:
+Admin Features:
 Can manage all users (view, edit, delete).
 Can approve or reject new restaurants that register on the platform.
 Can view all restaurant menus, orders, payments, and feedback.
@@ -48,7 +48,7 @@ Can generate reports (total orders, revenue, top restaurants, top dishes).
 Can send suggestions or performance feedback to restaurants.
 All reports and totals must display prices in INR (₹).
 
-🍴 Restaurant (Owner) Features:
+Restaurant (Owner) Features:
 Can register and log in securely.
 Can create, edit, and delete food items (menu management).
 Can set item prices in ₹ INR, add descriptions, and mark items as available/unavailable.
@@ -57,7 +57,7 @@ Can update order status (e.g., Preparing, Out for Delivery, Delivered).
 Can view customer feedback and average ratings.
 Dashboard should show total earnings in Indian Rupees (₹).
 
-👤 Customer Features:
+Customer Features:
 Can browse restaurants and menus.
 Can search for food items and filter by category, price (₹ range), and ratings.
 Can add food items to cart and place orders.
