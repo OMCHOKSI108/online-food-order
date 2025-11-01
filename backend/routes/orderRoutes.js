@@ -49,6 +49,11 @@ router.post("/", verifyToken, async (req, res) => {
       status: "pending"
     });
 
+    // Update user stats
+    await User.findByIdAndUpdate(req.user.id, {
+      $inc: { totalOrders: 1, totalSpent: totalAmount }
+    });
+
     res.status(201).json({ 
       message: "Order placed successfully", 
       order,
