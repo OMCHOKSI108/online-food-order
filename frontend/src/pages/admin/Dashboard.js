@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { Link } from "react-router-dom";
 import adminService from "../../services/adminService";
+import { BsClipboard, BsBarChart, BsGear, BsGraphUp, BsPeople, BsCheck, BsBox } from "react-icons/bs";
 
 export default function AdminDashboard() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,9 +15,14 @@ export default function AdminDashboard() {
   const fetchStats = async () => {
     try {
       setLoading(true);
+      console.log("Fetching admin stats...");
       const response = await adminService.getStatistics();
+      console.log("Admin stats response:", response);
+      console.log("Admin stats data:", response.data);
       setStats(response.data.stats);
+      console.log("Stats set to state:", response.data.stats);
     } catch (err) {
+      console.error("Error fetching stats:", err);
       setError("Failed to load statistics");
     } finally {
       setLoading(false);
@@ -50,6 +53,7 @@ export default function AdminDashboard() {
 
       {stats && (
         <>
+          {console.log("Rendering stats:", stats)}
           <div className="row mb-4">
             <div className="col-md-3">
               <div className="card shadow-lg text-center">
@@ -89,7 +93,9 @@ export default function AdminDashboard() {
                     {stats.totalOrders || 0}
                   </h2>
                   <p className="text-muted">Total Orders</p>
-                  <button className="btn btn-sm btn-info">View</button>
+                  <Link to="/admin/orders" className="btn btn-sm btn-info">
+                    View
+                  </Link>
                 </div>
               </div>
             </div>
@@ -120,19 +126,28 @@ export default function AdminDashboard() {
                 </div>
                 <div className="card-body d-grid gap-2">
                   <Link to="/admin/restaurants" className="btn btn-success">
-                    ✓ Approve Pending Restaurants
+                    <BsCheck className="me-2" />
+                    Approve Pending Restaurants
                   </Link>
                   <Link to="/admin/users" className="btn btn-info">
-                    👥 Manage Users
+                    <BsPeople className="me-2" />
+                    Manage Users
+                  </Link>
+                  <Link to="/admin/orders" className="btn btn-success">
+                    <BsBox className="me-2" />
+                    View All Orders
                   </Link>
                   <Link to="/admin/restaurants" className="btn btn-warning">
-                    📋 View All Restaurants
+                    <BsClipboard className="me-2" />
+                    Manage Restaurants
                   </Link>
                   <Link to="/admin/reports" className="btn btn-primary">
-                    📊 View Reports
+                    <BsBarChart className="me-2" />
+                    View Reports
                   </Link>
                   <button className="btn btn-outline-secondary">
-                    ⚙️ System Settings
+                    <BsGear className="me-2" />
+                    System Settings
                   </button>
                 </div>
               </div>
@@ -141,7 +156,7 @@ export default function AdminDashboard() {
             <div className="col-md-6">
               <div className="card shadow-lg">
                 <div className="card-header bg-success text-white">
-                  <h5 className="mb-0">📈 This Month</h5>
+                  <h5 className="mb-0"><BsGraphUp className="me-2" /> This Month</h5>
                 </div>
                 <div className="card-body">
                   <p>
@@ -189,7 +204,8 @@ export default function AdminDashboard() {
                     </>
                   ) : (
                     <p className="text-success">
-                      ✓ All pending approvals are up to date!
+                      <BsCheck className="me-2" />
+                      All pending approvals are up to date!
                     </p>
                   )}
                 </div>
@@ -217,7 +233,7 @@ export default function AdminDashboard() {
             <div className="col-12">
               <div className="card shadow-lg">
                 <div className="card-header bg-info text-white">
-                  <h5 className="mb-0">📊 System Overview</h5>
+                  <h5 className="mb-0"><BsBarChart className="me-2" /> System Overview</h5>
                 </div>
                 <div className="card-body">
                   <div className="row text-center">

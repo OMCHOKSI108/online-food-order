@@ -5,9 +5,10 @@ const userSchema = new mongoose.Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ["customer", "restaurant", "admin"], default: "customer" },
+    role: { type: String, enum: ["customer", "restaurant", "admin", "superadmin"], default: "customer" },
     phone: { type: String },
     address: { type: String },
+    profilePicture: { type: String }, // URL to profile picture
     isActive: { type: Boolean, default: true },
     // For restaurant owners
     restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: "Restaurant" },

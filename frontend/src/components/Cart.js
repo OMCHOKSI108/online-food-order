@@ -1,45 +1,37 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { BsX } from "react-icons/bs";
+import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(stored);
-    const sum = stored.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const sum = stored.reduce((acc, item) => acc + item.foodItem.price * item.quantity, 0);
     setTotal(sum);
   }, []);
 
   const removeItem = id => {
-    const updated = cart.filter(item => item._id !== id);
+    const updated = cart.filter(item => item.foodItem._id !== id);
     localStorage.setItem("cart", JSON.stringify(updated));
     setCart(updated);
-    setTotal(updated.reduce((acc, i) => acc + i.price * i.quantity, 0));
+    setTotal(updated.reduce((acc, i) => acc + i.foodItem.price * i.quantity, 0));
   };
 
   const placeOrder = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return alert("Please login first");
-
-    try {
-      const items = cart.map(item => ({
-        foodItem: item._id,
-        quantity: item.quantity,
-      }));
-      const res = await axios.post(
-        "http://localhost:5000/api/orders",
-        { items, total },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      alert(res.data.message);
-      localStorage.removeItem("cart");
-      setCart([]);
-      setTotal(0);
-    } catch (err) {
-      alert("Order failed");
+    if (!user) {
+      navigate("/login");
+      return;
     }
+
+    // Navigate to checkout page instead of placing order directly
+    navigate("/checkout");
   };
 
   return (
@@ -60,16 +52,16 @@ const Cart = () => {
             </thead>
             <tbody>
               {cart.map(item => (
-                <tr key={item._id}>
-                  <td>{item.name}</td>
+                <tr key={item.foodItem._id}>
+                  <td>{item.foodItem.name}</td>
                   <td>{item.quantity}</td>
-                  <td>₹{item.price * item.quantity}</td>
+                  <td>₹{item.foodItem.price * item.quantity}</td>
                   <td>
                     <button
-                      onClick={() => removeItem(item._id)}
+                      onClick={() => removeItem(item.foodItem._id)}
                       className="btn btn-danger btn-sm"
                     >
-                      ❌
+                      <BsX />
                     </button>
                   </td>
                 </tr>
@@ -78,7 +70,7 @@ const Cart = () => {
           </table>
           <h5>Total: ₹{total}</h5>
           <button onClick={placeOrder} className="btn btn-success">
-            Place Order
+            {user ? "Proceed to Checkout" : "Sign In to Place Order"}
           </button>
         </>
       )}

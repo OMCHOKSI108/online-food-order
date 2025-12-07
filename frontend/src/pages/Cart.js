@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../hooks/useCart";
+import { BsCart } from "react-icons/bs";
 
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity, getTotalAmount, clearCart } = useCart();
@@ -18,7 +19,10 @@ export default function Cart() {
 
   return (
     <div className="container my-5">
-      <h2 className="mb-4">🛒 Shopping Cart</h2>
+      <h2 className="mb-4">
+        <BsCart className="me-2" />
+        Shopping Cart
+      </h2>
 
       <div className="row">
         <div className="col-md-8">

@@ -48,7 +48,32 @@ body {
 
 .form-control, .form-select {
   border-radius: 5px;
-  border: 1px solid #dee2e6;
+}
+
+/* Green tick animation */
+@keyframes checkmark {
+  0% {
+    transform: scale(0) rotate(45deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(45deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(45deg);
+    opacity: 1;
+  }
+}
+
+.success-checkmark {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: solid #28a745;
+  border-width: 0 3px 3px 0;
+  animation: checkmark 0.6s ease-in-out;
+  margin-right: 8px;
 }
 
 .form-control:focus, .form-select:focus {
@@ -181,5 +206,75 @@ body {
   .container {
     padding: 1rem;
   }
+}
+
+/* Transparent Navbar Styles */
+.navbar-transparent {
+  background: linear-gradient(135deg, rgba(13, 27, 42, 0.8) 0%, rgba(27, 38, 59, 0.8) 50%, rgba(65, 90, 119, 0.8) 100%) !important;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-transparent .navbar-brand,
+.navbar-transparent .nav-link {
+  color: #ffffff !important;
+  font-weight: 500;
+}
+
+.navbar-transparent .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.navbar-transparent .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='m4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Enhanced visibility for navbar elements on transparent navbar */
+.navbar-transparent .badge {
+  background-color: #ff6b6b !important;
+  color: white !important;
+  font-weight: bold;
+}
+
+.navbar-transparent .nav-link:hover {
+  color: #ff6b6b !important;
+  transition: color 0.3s ease;
+}
+
+/* Profile circle visibility in transparent navbar */
+.navbar-transparent .profile-circle-btn {
+  border: 2px solid rgba(255, 255, 255, 0.8) !important;
+  transition: all 0.3s ease;
+}
+
+.navbar-transparent .profile-circle-btn:hover {
+  border-color: #ff6b6b !important;
+  transform: scale(1.05);
+}
+
+/* Cylindrical Navbar Styles */
+.navbar {
+  border-radius: 0 0 25px 25px !important;
+  position: relative;
+}
+
+.navbar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  border-radius: inherit;
+  z-index: -1;
+}
+
+.navbar-dark.bg-dark {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%) !important;
+  border-radius: 0 0 25px 25px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 

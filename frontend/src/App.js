@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
+import { ToastProvider } from "./components/Toast";
 import Header from "./components/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -16,6 +17,7 @@ import Payment from "./pages/Payment";
 import OrderDetails from "./pages/OrderDetails";
 import Profile from "./pages/Profile";
 import Menu from "./pages/Menu";
+import Favorites from "./pages/Favorites";
 
 // Restaurant Pages
 import RestaurantDashboard from "./pages/restaurant/Dashboard";
@@ -27,7 +29,11 @@ import RestaurantSetup from "./pages/restaurant/Setup";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminRestaurants from "./pages/admin/Restaurants";
 import AdminUsers from "./pages/admin/Users";
+import AdminUserDetail from "./pages/admin/UserDetail";
 import AdminReports from "./pages/admin/Reports";
+import AdminOrders from "./pages/admin/Orders";
+
+import { FavoritesProvider } from "./context/FavoritesContext";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
@@ -36,9 +42,11 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <CartProvider>
-          <Header />
-          <Routes>
+        <ToastProvider>
+          <CartProvider>
+            <FavoritesProvider>
+              <Header />
+              <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -63,6 +71,14 @@ function App() {
               }
             />
             <Route
+              path="/favorites"
+              element={
+                <ProtectedRoute requiredRole="customer">
+                  <Favorites />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/orders"
               element={
                 <ProtectedRoute requiredRole="customer">
@@ -73,7 +89,7 @@ function App() {
             <Route
               path="/orders/:id"
               element={
-                <ProtectedRoute requiredRole="customer">
+                <ProtectedRoute requiredRole={["customer", "admin", "superadmin"]}>
                   <OrderDetails />
                 </ProtectedRoute>
               }
@@ -155,6 +171,14 @@ function App() {
               }
             />
             <Route
+              path="/admin/users/:userId"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminUserDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/admin/reports"
               element={
                 <ProtectedRoute requiredRole="admin">
@@ -162,8 +186,18 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/orders"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminOrders />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
+            </FavoritesProvider>
         </CartProvider>
+        </ToastProvider>
       </AuthProvider>
     </Router>
   );

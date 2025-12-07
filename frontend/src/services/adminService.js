@@ -1,67 +1,63 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
 export const adminService = {
-  getAllUsers: (token) =>
-    axios.get(`${API_URL}/admin/users`, {
-      headers: { Authorization: `Bearer ${token}` }
-    }),
+  getAllUsers: () =>
+    axios.get(`${API_URL}/admin/users`),
 
-  deleteUser: (userId, token) =>
-    axios.delete(`${API_URL}/admin/users/${userId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    }),
+  deleteUser: (userId) =>
+    axios.delete(`${API_URL}/admin/users/${userId}`),
 
-  editUser: (userId, data, token) =>
-    axios.put(`${API_URL}/admin/users/${userId}`, data, {
-      headers: { Authorization: `Bearer ${token}` }
-    }),
+  editUser: (userId, data) =>
+    axios.put(`${API_URL}/admin/users/${userId}`, data),
 
-  getPendingRestaurants: (token) =>
-    axios.get(`${API_URL}/admin/restaurants/pending`, {
-      headers: { Authorization: `Bearer ${token}` }
-    }),
+  getUserDetails: (userId) =>
+    axios.get(`${API_URL}/admin/users/${userId}/details`),
 
-  approveRestaurant: (restaurantId, token) =>
-    axios.put(`${API_URL}/admin/restaurants/${restaurantId}/approve`, {}, {
-      headers: { Authorization: `Bearer ${token}` }
-    }),
+  toggleUserStatus: (userId) =>
+    axios.put(`${API_URL}/admin/users/${userId}/toggle-status`),
 
-  rejectRestaurant: (restaurantId, data, token) =>
-    axios.put(`${API_URL}/admin/restaurants/${restaurantId}/reject`, data, {
-      headers: { Authorization: `Bearer ${token}` }
-    }),
+  sendUserNotification: (userId, data) =>
+    axios.post(`${API_URL}/admin/users/${userId}/notify`, data),
 
-  getAllOrders: (token) =>
-    axios.get(`${API_URL}/admin/orders`, {
-      headers: { Authorization: `Bearer ${token}` }
-    }),
+  sendBroadcastNotification: (data) =>
+    axios.post(`${API_URL}/admin/notifications/broadcast`, data),
 
-  getAllPayments: (token) =>
-    axios.get(`${API_URL}/admin/payments`, {
-      headers: { Authorization: `Bearer ${token}` }
-    }),
+  getPendingRestaurants: () =>
+    axios.get(`${API_URL}/admin/restaurants/pending`),
 
-  getRevenueReport: (token) =>
-    axios.get(`${API_URL}/admin/reports/revenue`, {
-      headers: { Authorization: `Bearer ${token}` }
-    }),
+  getAllRestaurants: () =>
+    axios.get(`${API_URL}/admin/restaurants`),
 
-  getTopRestaurants: (token) =>
-    axios.get(`${API_URL}/admin/reports/top-restaurants`, {
-      headers: { Authorization: `Bearer ${token}` }
-    }),
+  approveRestaurant: (restaurantId) =>
+    axios.put(`${API_URL}/admin/restaurants/${restaurantId}/approve`, {}),
 
-  getTopDishes: (token) =>
-    axios.get(`${API_URL}/admin/reports/top-dishes`, {
-      headers: { Authorization: `Bearer ${token}` }
-    }),
+  rejectRestaurant: (restaurantId, data) =>
+    axios.put(`${API_URL}/admin/restaurants/${restaurantId}/reject`, data),
 
-  getStatistics: (token) =>
-    axios.get(`${API_URL}/admin/stats`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+  toggleRestaurantStatus: (restaurantId) =>
+    axios.put(`${API_URL}/admin/restaurants/${restaurantId}/toggle-status`),
+
+  getAllOrders: () =>
+    axios.get(`${API_URL}/admin/orders`),
+
+  getAllPayments: () =>
+    axios.get(`${API_URL}/admin/payments`),
+
+  getRevenueReport: () =>
+    axios.get(`${API_URL}/admin/reports/revenue`),
+
+  getTopRestaurants: () =>
+    axios.get(`${API_URL}/admin/reports/top-restaurants`),
+
+  getTopDishes: () =>
+    axios.get(`${API_URL}/admin/reports/top-dishes`),
+
+  getStatistics: () => {
+    console.log("Making API call to getStatistics");
+    return axios.get(`${API_URL}/admin/stats`);
+  }
 };
 
 export default adminService;

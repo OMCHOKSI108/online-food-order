@@ -32,11 +32,11 @@ app.use("/api/admin", adminRoutes);
 
 // Default route
 app.get("/", (req, res) => {
-  res.send("🍔 Online Food Ordering System API is running...");
+  res.send("Online Food Ordering System API is running...");
 });
 
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

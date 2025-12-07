@@ -1,0 +1,159 @@
+.popular-dishes {
+  background: white;
+  padding: 60px 0;
+  width: 100%;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.popular-dishes h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 40px;
+}
+
+.carousel-container {
+  position: relative;
+}
+
+.carousel {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 20px 0;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.carousel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.dish-item {
+  flex: 0 0 auto;
+  text-align: center;
+  width: 150px;
+}
+
+.dish-item img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  object-fit: cover;
+}
+
+.dish-item:hover img {
+  transform: translateY(-5px);
+}
+
+.dish-item p {
+  margin-top: 10px;
+  font-size: 1.1rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.arrow {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #333;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+}
+
+.arrow:hover {
+  background: #e0e0e0;
+}
+
+.arrow.left {
+  right: 60px;
+}
+
+.arrow:focus {
+  outline: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .popular-dishes h2 {
+    font-size: 2rem;
+  }
+
+  .dish-item {
+    width: 120px;
+  }
+
+  .dish-item img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .dish-item p {
+    font-size: 1rem;
+  }
+
+  .arrow {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+
+  .arrow.left {
+    right: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .popular-dishes {
+    padding: 40px 0;
+  }
+
+  .popular-dishes h2 {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+  }
+
+  .dish-item {
+    width: 100px;
+  }
+
+  .dish-item img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .dish-item p {
+    font-size: 0.9rem;
+  }
+
+  .arrow {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+
+  .arrow.left {
+    right: 45px;
+  }
+}

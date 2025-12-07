@@ -30,7 +30,7 @@ export const verifyRole = (allowedRoles) => {
 };
 
 export const verifyAdmin = (req, res, next) => {
-  verifyRole(["admin"])(req, res, next);
+  verifyRole(["admin", "superadmin"])(req, res, next);
 };
 
 export const verifyRestaurant = (req, res, next) => {

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
 import adminService from "../../services/adminService";
+import { BsArrowLeft, BsPeople, BsTrash, BsPause } from "react-icons/bs";
 
 export default function AdminUsers() {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -74,14 +73,15 @@ export default function AdminUsers() {
     <div className="container-fluid my-4">
       <div className="row mb-4">
         <div className="col">
-          <h2>👥 User Management</h2>
+          <h2><BsPeople className="me-2" /> User Management</h2>
         </div>
         <div className="col text-end">
           <button
             className="btn btn-primary"
             onClick={() => navigate("/admin/dashboard")}
           >
-            ⬅️ Back to Dashboard
+            <BsArrowLeft className="me-2" />
+            Back to Dashboard
           </button>
         </div>
       </div>
@@ -228,14 +228,14 @@ export default function AdminUsers() {
                             className="btn btn-sm btn-warning me-2"
                             onClick={() => handleDeactivateUser(u._id)}
                           >
-                            ⏸️
+                            <BsPause />
                           </button>
                         )}
                         <button
                           className="btn btn-sm btn-danger"
                           onClick={() => handleDeleteUser(u._id)}
                         >
-                          🗑️
+                          <BsTrash />
                         </button>
                       </td>
                     </tr>

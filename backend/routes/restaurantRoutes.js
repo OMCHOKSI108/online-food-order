@@ -28,6 +28,18 @@ router.get("/:id/menu", async (req, res) => {
   }
 });
 
+// PUBLIC - Get all available food items for homepage showcase
+router.get("/food-items/all", async (req, res) => {
+  try {
+    const items = await FoodItem.find({ isAvailable: true })
+      .populate("restaurant", "name")
+      .limit(18); // Get 18 items for 3 rows of 6
+    res.json(items);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching food items" });
+  }
+});
+
 // 🍴 RESTAURANT - REGISTER RESTAURANT
 router.post("/register", verifyToken, async (req, res) => {
   try {
@@ -52,6 +64,8 @@ router.post("/register", verifyToken, async (req, res) => {
       owner: req.user.id,
       approvalStatus: "pending"
     });
+
+    console.log("Restaurant registered:", restaurant);
 
     // Link restaurant to user
     await User.findByIdAndUpdate(req.user.id, { restaurantId: restaurant._id });

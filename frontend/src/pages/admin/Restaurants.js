@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
 import adminService from "../../services/adminService";
+import { BsArrowLeft, BsStar, BsCheck, BsPause, BsX } from "react-icons/bs";
+import { toast } from "react-toastify";
 
 export default function AdminRestaurants() {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const [restaurants, setRestaurants] = useState([]);
-  const [pendingRestaurants, setPendingRestaurants] = useState([]);
+  const [allRestaurants, setAllRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterStatus, setFilterStatus] = useState("pending");
-  const [rejectReason, setRejectReason] = useState("");
-  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
 
   useEffect(() => {
     fetchRestaurants();
@@ -21,9 +18,14 @@ export default function AdminRestaurants() {
   const fetchRestaurants = async () => {
     try {
       setLoading(true);
-      const response = await adminService.getPendingRestaurants();
-      setPendingRestaurants(response.data.restaurants || []);
+      console.log("Fetching all restaurants...");
+      const response = await adminService.getAllRestaurants();
+      console.log("All restaurants response:", response);
+      console.log("All restaurants data:", response.data);
+      setAllRestaurants(response.data || []);
+      console.log("Set all restaurants to:", response.data || []);
     } catch (err) {
+      console.error("Error fetching restaurants:", err);
       setError("Failed to load restaurants");
     } finally {
       setLoading(false);
@@ -32,11 +34,14 @@ export default function AdminRestaurants() {
 
   const handleApprove = async (restaurantId) => {
     try {
+      console.log("Approving restaurant:", restaurantId);
       await adminService.approveRestaurant(restaurantId);
-      alert("Restaurant approved successfully!");
-      fetchRestaurants();
+      console.log("Restaurant approved successfully");
+      toast.success("Restaurant approved successfully!");
+      fetchRestaurants(); // Refresh the list
     } catch (err) {
-      alert("Failed to approve restaurant");
+      console.error("Error approving restaurant:", err);
+      toast.error("Failed to approve restaurant");
     }
   };
 
@@ -44,12 +49,28 @@ export default function AdminRestaurants() {
     const reason = prompt("Enter rejection reason:");
     if (reason) {
       try {
-        await adminService.rejectRestaurant(restaurantId, { reason });
-        alert("Restaurant rejected!");
-        fetchRestaurants();
+        console.log("Rejecting restaurant:", restaurantId);
+        await adminService.rejectRestaurant(restaurantId, { rejectionReason: reason });
+        console.log("Restaurant rejected successfully");
+        toast.success("Restaurant rejected successfully!");
+        fetchRestaurants(); // Refresh the list
       } catch (err) {
-        alert("Failed to reject restaurant");
+        console.error("Error rejecting restaurant:", err);
+        toast.error("Failed to reject restaurant");
       }
+    }
+  };
+
+  const handleToggleStatus = async (restaurantId) => {
+    try {
+      console.log("Toggling restaurant status:", restaurantId);
+      const response = await adminService.toggleRestaurantStatus(restaurantId);
+      console.log("Restaurant status toggled successfully:", response.data);
+      toast.success(response.data.message);
+      fetchRestaurants(); // Refresh the list
+    } catch (err) {
+      console.error("Error toggling restaurant status:", err);
+      toast.error("Failed to toggle restaurant status");
     }
   };
 
@@ -76,7 +97,8 @@ export default function AdminRestaurants() {
             className="btn btn-primary"
             onClick={() => navigate("/admin/dashboard")}
           >
-            ⬅️ Back to Dashboard
+            <BsArrowLeft className="me-2" />
+            Back to Dashboard
           </button>
         </div>
       </div>
@@ -92,11 +114,20 @@ export default function AdminRestaurants() {
             <button
               type="button"
               className={`btn ${
+                filterStatus === "all" ? "btn-primary" : "btn-outline-primary"
+              }`}
+              onClick={() => setFilterStatus("all")}
+            >
+              📋 All ({allRestaurants.length})
+            </button>
+            <button
+              type="button"
+              className={`btn ${
                 filterStatus === "pending" ? "btn-warning" : "btn-outline-warning"
               }`}
               onClick={() => setFilterStatus("pending")}
             >
-              ⏳ Pending ({pendingRestaurants.length})
+              ⏳ Pending ({allRestaurants.filter(r => r.approvalStatus === "pending").length})
             </button>
             <button
               type="button"
@@ -105,7 +136,8 @@ export default function AdminRestaurants() {
               }`}
               onClick={() => setFilterStatus("approved")}
             >
-              ✓ Approved
+              <BsCheck className="me-2" />
+              Approved ({allRestaurants.filter(r => r.approvalStatus === "approved").length})
             </button>
             <button
               type="button"
@@ -114,18 +146,17 @@ export default function AdminRestaurants() {
               }`}
               onClick={() => setFilterStatus("rejected")}
             >
-              ✗ Rejected
+              <BsX className="me-2" />
+              Rejected ({allRestaurants.filter(r => r.approvalStatus === "rejected").length})
             </button>
           </div>
         </div>
       </div>
 
-      {pendingRestaurants.length > 0 ? (
+      {allRestaurants.length > 0 ? (
         <div className="row">
-          {pendingRestaurants
-            .filter(
-              (r) => filterStatus === "pending" || r.approvalStatus === filterStatus
-            )
+          {allRestaurants
+            .filter((r) => filterStatus === "all" || r.approvalStatus === filterStatus)
             .map((restaurant) => (
               <div key={restaurant._id} className="col-md-6 mb-4">
                 <div className="card shadow-lg">
@@ -176,7 +207,7 @@ export default function AdminRestaurants() {
                       </span>
                     </p>
                     <p>
-                      <strong>Rating:</strong> ⭐{restaurant.rating || 0}
+                      <strong>Rating:</strong> <BsStar className="me-1" />{restaurant.rating || 0}
                     </p>
                     <p>
                       <strong>Total Orders:</strong> {restaurant.totalOrders}
@@ -201,13 +232,15 @@ export default function AdminRestaurants() {
                             className="btn btn-success btn-sm"
                             onClick={() => handleApprove(restaurant._id)}
                           >
-                            ✓ Approve Restaurant
+                            <BsCheck className="me-2" />
+                            Approve Restaurant
                           </button>
                           <button
                             className="btn btn-danger btn-sm"
                             onClick={() => handleReject(restaurant._id)}
                           >
-                            ✗ Reject Restaurant
+                            <BsX className="me-2" />
+                            Reject Restaurant
                           </button>
                         </>
                       )}
@@ -223,12 +256,11 @@ export default function AdminRestaurants() {
                             👁️ View Details
                           </button>
                           <button
-                            className="btn btn-warning btn-sm"
-                            onClick={() =>
-                              alert("Deactivate functionality coming soon")
-                            }
+                            className={`btn btn-sm ${restaurant.isActive ? 'btn-warning' : 'btn-success'}`}
+                            onClick={() => handleToggleStatus(restaurant._id)}
                           >
-                            ⏸️ Deactivate
+                            {restaurant.isActive ? <BsPause className="me-2" /> : <BsCheck className="me-2" />}
+                            {restaurant.isActive ? 'Deactivate' : 'Activate'}
                           </button>
                         </>
                       )}

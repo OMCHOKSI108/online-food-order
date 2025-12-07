@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
 import restaurantService from "../../services/restaurantService";
+import { GiForkKnifeSpoon } from "react-icons/gi";
+import { BsClipboard, BsBox, BsStar, BsCheck, BsX, BsPlus, BsGear, BsGraphUp, BsFileText, BsBarChart, BsClock } from "react-icons/bs";
 
 export default function RestaurantDashboard() {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [restaurant, setRestaurant] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,8 +19,8 @@ export default function RestaurantDashboard() {
     try {
       setLoading(true);
       const response = await restaurantService.getMyRestaurant();
-      setRestaurant(response.data.restaurant);
-      setRecentOrders(response.data.recentOrders || []);
+      setRestaurant(response.data);
+      setRecentOrders([]); // For now, not fetching orders
     } catch (err) {
       setError("Failed to load restaurant data");
     } finally {
@@ -54,6 +54,30 @@ export default function RestaurantDashboard() {
     );
   }
 
+  if (restaurant && restaurant.approvalStatus === "pending") {
+    return (
+      <div className="container my-5">
+        <div className="row justify-content-center">
+          <div className="col-md-6 text-center">
+            <div className="card shadow">
+              <div className="card-body p-5">
+                <BsClock className="text-warning mb-3" size={64} />
+                <h3>Restaurant Registration Pending</h3>
+                <p className="text-muted">
+                  Your restaurant registration is under review by our admin team.
+                  You will be notified once it's approved and your dashboard becomes active.
+                </p>
+                <div className="mt-4">
+                  <small className="text-muted">Submitted on: {new Date(restaurant.createdAt).toLocaleDateString()}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const getApprovalBadge = (status) => {
     const colors = {
       pending: "warning",
@@ -67,20 +91,25 @@ export default function RestaurantDashboard() {
     <div className="container-fluid my-4">
       <div className="row mb-4">
         <div className="col">
-          <h2>🍴 Restaurant Dashboard</h2>
+          <h2>
+            <GiForkKnifeSpoon className="me-2" />
+            Restaurant Dashboard
+          </h2>
         </div>
         <div className="col text-end">
           <button
             className="btn btn-primary me-2"
             onClick={() => navigate("/restaurant/menu")}
           >
-            📋 Manage Menu
+            <BsClipboard className="me-1" />
+            Manage Menu
           </button>
           <button
             className="btn btn-success"
             onClick={() => navigate("/restaurant/orders")}
           >
-            📦 View Orders
+            <BsBox className="me-1" />
+            View Orders
           </button>
         </div>
       </div>
@@ -124,7 +153,8 @@ export default function RestaurantDashboard() {
                 </div>
                 <div className="card-body text-center">
                   <h3 className="text-warning">
-                    ⭐ {restaurant.rating || 0}
+                    <BsStar className="me-1" />
+                    {restaurant.rating || 0}
                   </h3>
                   <p className="text-muted">Customer Rating</p>
                   <hr />
@@ -160,7 +190,10 @@ export default function RestaurantDashboard() {
             <div className="col-md-3">
               <div className="card text-center shadow">
                 <div className="card-body">
-                  <h2 className="text-warning">⭐{restaurant.rating || 0}</h2>
+                  <h2 className="text-warning">
+                    <BsStar className="me-1" />
+                    {restaurant.rating || 0}
+                  </h2>
                   <p className="text-muted">Rating</p>
                 </div>
               </div>
@@ -169,7 +202,7 @@ export default function RestaurantDashboard() {
               <div className="card text-center shadow">
                 <div className="card-body">
                   <h2 className="text-info">
-                    {restaurant.isActive ? "✓" : "✗"}
+                    {restaurant.isActive ? <BsCheck className="text-success" /> : <BsX className="text-danger" />}
                   </h2>
                   <p className="text-muted">
                     {restaurant.isActive ? "Active" : "Inactive"}
@@ -183,23 +216,31 @@ export default function RestaurantDashboard() {
             <div className="col-md-6">
               <div className="card shadow-lg">
                 <div className="card-header bg-success text-white">
-                  <h5 className="mb-0">📋 Quick Actions</h5>
+                  <h5 className="mb-0">
+                    <BsClipboard className="me-2" />
+                    Quick Actions
+                  </h5>
                 </div>
                 <div className="card-body d-grid gap-2">
                   <Link to="/restaurant/menu" className="btn btn-success">
-                    ➕ Add New Dish
+                    <BsPlus className="me-1" />
+                    Add New Dish
                   </Link>
                   <Link to="/restaurant/menu" className="btn btn-info">
-                    📝 Edit Menu
+                    <BsFileText className="me-1" />
+                    Edit Menu
                   </Link>
                   <Link to="/restaurant/orders" className="btn btn-warning">
-                    📦 Incoming Orders
+                    <BsBox className="me-1" />
+                    Incoming Orders
                   </Link>
                   <button className="btn btn-outline-primary">
-                    📊 View Analytics
+                    <BsBarChart className="me-1" />
+                    View Analytics
                   </button>
                   <button className="btn btn-outline-secondary">
-                    ⚙️ Settings
+                    <BsGear className="me-1" />
+                    Settings
                   </button>
                 </div>
               </div>
@@ -208,7 +249,10 @@ export default function RestaurantDashboard() {
             <div className="col-md-6">
               <div className="card shadow-lg">
                 <div className="card-header bg-primary text-white">
-                  <h5 className="mb-0">📈 This Month</h5>
+                  <h5 className="mb-0">
+                    <BsGraphUp className="me-2" />
+                    This Month
+                  </h5>
                 </div>
                 <div className="card-body">
                   <p>
@@ -218,7 +262,7 @@ export default function RestaurantDashboard() {
                     <strong>Revenue:</strong> ₹{restaurant.totalEarnings || 0}
                   </p>
                   <p>
-                    <strong>Avg Rating:</strong> ⭐
+                    <strong>Avg Rating:</strong> <BsStar className="me-1" />
                     {restaurant.rating || 0}
                   </p>
                   <p>
@@ -239,7 +283,10 @@ export default function RestaurantDashboard() {
           {recentOrders.length > 0 && (
             <div className="card shadow-lg">
               <div className="card-header bg-info text-white">
-                <h5 className="mb-0">📦 Recent Orders</h5>
+                <h5 className="mb-0">
+                  <BsBox className="me-2" />
+                  Recent Orders
+                </h5>
               </div>
               <div className="card-body">
                 <div className="table-responsive">

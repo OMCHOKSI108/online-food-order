@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
 import restaurantService from "../../services/restaurantService";
+import { BsClipboard,BsStar, BsArrowLeft, BsPlus, BsPencil, BsCheck, BsTrash } from "react-icons/bs";
 
 export default function RestaurantMenu() {
-  const { user } = useAuth();
   const navigate = useNavigate();
+  const [restaurant, setRestaurant] = useState(null);
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,16 +21,20 @@ export default function RestaurantMenu() {
   });
 
   useEffect(() => {
-    fetchMenuItems();
+    fetchData();
   }, []);
 
-  const fetchMenuItems = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await restaurantService.getMyMenu();
-      setMenuItems(response.data.items || []);
+      const restaurantRes = await restaurantService.getMyRestaurant();
+      setRestaurant(restaurantRes.data);
+      if (restaurantRes.data.approvalStatus === "approved") {
+        const menuRes = await restaurantService.getMyMenu();
+        setMenuItems(menuRes.data.items || []);
+      }
     } catch (err) {
-      setError("Failed to load menu items");
+      setError("Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -55,7 +59,7 @@ export default function RestaurantMenu() {
         alert("Item added successfully!");
       }
       resetForm();
-      fetchMenuItems();
+      fetchData();
     } catch (err) {
       setError("Failed to save item");
     }
@@ -72,7 +76,7 @@ export default function RestaurantMenu() {
       try {
         await restaurantService.deleteFoodItem(id);
         alert("Item deleted successfully!");
-        fetchMenuItems();
+        fetchData();
       } catch (err) {
         setError("Failed to delete item");
       }
@@ -104,18 +108,34 @@ export default function RestaurantMenu() {
     );
   }
 
+  if (restaurant && restaurant.approvalStatus !== "approved") {
+    return (
+      <div className="container my-5">
+        <div className="alert alert-warning text-center">
+          <h4>Restaurant Not Approved</h4>
+          <p>Your restaurant must be approved by admin before you can manage your menu.</p>
+          <p>Current status: <strong>{restaurant.approvalStatus}</strong></p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container my-5">
       <div className="row mb-4">
         <div className="col">
-          <h2>📋 Menu Management</h2>
+          <h2>
+            <BsClipboard className="me-2" />
+            Menu Management
+          </h2>
         </div>
         <div className="col text-end">
           <button
             className="btn btn-primary me-2"
             onClick={() => navigate("/restaurant/dashboard")}
           >
-            ⬅️ Back
+            <BsArrowLeft className="me-1" />
+            Back
           </button>
           <button
             className="btn btn-success"
@@ -124,7 +144,8 @@ export default function RestaurantMenu() {
               setShowForm(true);
             }}
           >
-            ➕ Add New Item
+            <BsPlus className="me-1" />
+            Add New Item
           </button>
         </div>
       </div>
@@ -135,7 +156,17 @@ export default function RestaurantMenu() {
         <div className="card shadow-lg mb-4">
           <div className="card-header bg-info text-white">
             <h5 className="mb-0">
-              {editingId ? "✏️ Edit Item" : "➕ Add New Item"}
+              {editingId ? (
+                <>
+                  <BsPencil className="me-2" />
+                  Edit Item
+                </>
+              ) : (
+                <>
+                  <BsPlus className="me-2" />
+                  Add New Item
+                </>
+              )}
             </h5>
           </div>
           <div className="card-body">
@@ -228,7 +259,17 @@ export default function RestaurantMenu() {
 
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                 <button type="submit" className="btn btn-success">
-                  {editingId ? "✓ Update Item" : "✓ Add Item"}
+                  {editingId ? (
+                    <>
+                      <BsCheck className="me-1" />
+                      Update Item
+                    </>
+                  ) : (
+                    <>
+                      <BsCheck className="me-1" />
+                      Add Item
+                    </>
+                  )}
                 </button>
                 <button
                   type="button"
@@ -282,7 +323,8 @@ export default function RestaurantMenu() {
                       </td>
                       <td>{item.preparationTime} mins</td>
                       <td>
-                        ⭐ {item.rating || 0} ({item.totalRatings || 0})
+                        <BsStar className="me-1" />
+                        {item.rating || 0} ({item.totalRatings || 0})
                       </td>
                       <td>
                         <span
@@ -298,13 +340,13 @@ export default function RestaurantMenu() {
                           className="btn btn-sm btn-primary me-2"
                           onClick={() => handleEdit(item)}
                         >
-                          ✏️
+                          <BsPencil />
                         </button>
                         <button
                           className="btn btn-sm btn-danger"
                           onClick={() => handleDelete(item._id)}
                         >
-                          🗑️
+                          <BsTrash />
                         </button>
                       </td>
                     </tr>
@@ -322,7 +364,8 @@ export default function RestaurantMenu() {
             className="btn btn-success"
             onClick={() => setShowForm(true)}
           >
-            ➕ Add First Item
+            <BsPlus className="me-1" />
+            Add First Item
           </button>
         </div>
       )}

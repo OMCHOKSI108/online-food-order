@@ -13,7 +13,7 @@ const router = express.Router();
 // 👤 CUSTOMER - PLACE ORDER
 router.post("/", verifyToken, async (req, res) => {
   try {
-    const { items, deliveryAddress, paymentMethod } = req.body;
+    const { items, deliveryAddress } = req.body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ message: "Cart is empty" });
@@ -22,6 +22,7 @@ router.post("/", verifyToken, async (req, res) => {
     // Calculate total and get restaurant ID from first item
     let totalAmount = 0;
     let restaurantId = null;
+    const itemsWithPrices = [];
 
     for (let item of items) {
       const foodItem = await FoodItem.findById(item.foodItem);
@@ -36,18 +37,25 @@ router.post("/", verifyToken, async (req, res) => {
       }
 
       totalAmount += foodItem.price * item.quantity;
+      itemsWithPrices.push({
+        foodItem: item.foodItem,
+        quantity: item.quantity,
+        price: foodItem.price
+      });
     }
 
-    // Create order
-    const order = await Order.create({
+    // Create order with pending status - payment method will be selected later
+    const orderData = {
       user: req.user.id,
       restaurant: restaurantId,
-      items,
+      items: itemsWithPrices,
       totalAmount,
       deliveryAddress,
-      paymentMethod,
-      status: "pending"
-    });
+      status: "pending",
+      paymentStatus: "pending"
+    };
+
+    const order = await Order.create(orderData);
 
     // Update user stats
     await User.findByIdAndUpdate(req.user.id, {
@@ -76,6 +84,33 @@ router.post("/:id/payment", verifyToken, async (req, res) => {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
+    // Handle Cash on Delivery
+    if (paymentMethod === "cod") {
+      await Order.findByIdAndUpdate(req.params.id, {
+        paymentMethod: "cod",
+        paymentStatus: "cod",
+        status: "confirmed"
+      });
+
+      const payment = await Payment.create({
+        order: order._id,
+        user: req.user.id,
+        amount: order.totalAmount,
+        paymentMethod: "cod",
+        transactionId: `COD${Date.now()}`,
+        status: "pending",
+      });
+
+      return res.json({
+        success: true,
+        message: "Order confirmed for Cash on Delivery",
+        transactionId: payment.transactionId,
+        amount: `₹${order.totalAmount}`,
+        order
+      });
+    }
+
+    // Handle Online Payment
     // Generate transaction ID
     const transactionId = `TXN${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
 
@@ -94,7 +129,11 @@ router.post("/:id/payment", verifyToken, async (req, res) => {
 
     if (isSuccess) {
       // Update order payment status
-      await Order.findByIdAndUpdate(req.params.id, { paymentStatus: "completed" });
+      await Order.findByIdAndUpdate(req.params.id, {
+        paymentMethod,
+        paymentStatus: "completed",
+        status: "confirmed"
+      });
       
       // Update restaurant earnings
       const restaurant = await Restaurant.findByIdAndUpdate(
@@ -116,7 +155,10 @@ router.post("/:id/payment", verifyToken, async (req, res) => {
       });
     } else {
       // Update order payment status
-      await Order.findByIdAndUpdate(req.params.id, { paymentStatus: "failed" });
+      await Order.findByIdAndUpdate(req.params.id, {
+        paymentMethod,
+        paymentStatus: "failed"
+      });
 
       res.status(400).json({
         success: false,
@@ -139,8 +181,19 @@ router.get("/", verifyToken, async (req, res) => {
       .populate("items.foodItem", "name price")
       .sort({ createdAt: -1 });
 
+    console.log("=== GET USER ORDERS ===");
+    console.log("User ID:", req.user.id);
+    console.log("Orders found:", orders.length);
+    if (orders.length > 0) {
+      console.log("First order:", orders[0]);
+      console.log("First order ID:", orders[0]._id);
+      console.log("First order ID type:", typeof orders[0]._id);
+    }
+    console.log("=========================");
+
     res.json(orders);
   } catch (error) {
+    console.error("Error fetching orders:", error);
     res.status(500).json({ message: "Error fetching orders" });
   }
 });
@@ -148,17 +201,35 @@ router.get("/", verifyToken, async (req, res) => {
 // 👤 CUSTOMER - GET ORDER DETAILS
 router.get("/:id", verifyToken, async (req, res) => {
   try {
+    console.log("=== GET ORDER DETAILS ===");
+    console.log("Full URL:", req.originalUrl);
+    console.log("Method:", req.method);
+    console.log("Params:", req.params);
+    console.log("Params.id:", req.params.id);
+    console.log("User role:", req.user.role);
+    console.log("User ID:", req.user.id);
+    console.log("========================");
+    
     const order = await Order.findById(req.params.id)
       .populate("restaurant", "name address image")
       .populate("items.foodItem", "name price description");
 
+    console.log("Order found:", !!order);
+    if (order) {
+      console.log("Order user:", order.user.toString());
+      console.log("Is owner or admin:", order.user.toString() === req.user.id || req.user.role === "admin" || req.user.role === "superadmin");
+    }
+
     if (!order) return res.status(404).json({ message: "Order not found" });
-    if (order.user.toString() !== req.user.id) {
+    
+    // Allow admins to view any order, otherwise check ownership
+    if (req.user.role !== "admin" && req.user.role !== "superadmin" && order.user.toString() !== req.user.id) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
     res.json(order);
   } catch (error) {
+    console.error("Error fetching order:", error);
     res.status(500).json({ message: "Error fetching order" });
   }
 });

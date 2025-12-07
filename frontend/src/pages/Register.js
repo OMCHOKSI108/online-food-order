@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { GiHamburger, GiForkKnifeSpoon } from "react-icons/gi";
+import { BsPerson } from "react-icons/bs";
 
 export default function Register() {
   const { register } = useAuth();
@@ -52,7 +54,10 @@ export default function Register() {
     <div className="container d-flex align-items-center justify-content-center" style={{ minHeight: "100vh" }}>
       <div className="card shadow-lg" style={{ width: "100%", maxWidth: "500px" }}>
         <div className="card-body p-5">
-          <h2 className="text-center mb-4">🍔 Register</h2>
+          <h2 className="text-center mb-4">
+            <GiHamburger className="me-2" />
+            Register
+          </h2>
 
           {error && <div className="alert alert-danger">{error}</div>}
 
@@ -104,8 +109,14 @@ export default function Register() {
                 value={form.role}
                 onChange={handleChange}
               >
-                <option value="customer">👤 Customer</option>
-                <option value="restaurant">🍴 Restaurant Owner</option>
+                <option value="customer">
+                  <BsPerson className="me-1" />
+                  Customer
+                </option>
+                <option value="restaurant">
+                  <GiForkKnifeSpoon className="me-1" />
+                  Restaurant Owner
+                </option>
               </select>
             </div>
 

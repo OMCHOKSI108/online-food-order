@@ -1,8 +1,10 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
+import { AuthContext } from "./AuthContext";
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
+  const { user } = useContext(AuthContext);
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
@@ -53,6 +55,10 @@ export const CartProvider = ({ children }) => {
   };
 
   const clearCart = () => {
+    if (!user) {
+      alert("Please login to modify cart");
+      return;
+    }
     setCart([]);
   };
 

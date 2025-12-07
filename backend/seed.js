@@ -29,12 +29,48 @@ const seedData = async () => {
       return await bcrypt.hash(password, salt);
     };
 
-    // Sample Users
+    // Sample Users with different roles
+    const hashedSuperAdminPassword = await hashPassword("superadmin123");
     const hashedAdminPassword = await hashPassword("admin123");
     const hashedOwnerPassword = await hashPassword("owner123");
     const hashedCustomerPassword = await hashPassword("customer123");
 
-    // Indian names for customers and owners
+    // Super Admin (Developer)
+    const superAdminUsers = [
+      {
+        name: "Developer Admin",
+        email: "superadmin@foodhub.com",
+        password: hashedSuperAdminPassword,
+        role: "superadmin",
+        phone: "+91-9999999999",
+        address: "Tech Hub, Bangalore, Karnataka",
+        profilePicture: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
+        isActive: true,
+        totalEarnings: 0,
+        totalOrders: 0,
+        totalSpent: 0
+      }
+    ];
+
+    // Restaurant Owners (Admins)
+    // System Admin
+    const systemAdminUsers = [
+      {
+        name: "System Administrator",
+        email: "admin@foodhub.com",
+        password: hashedAdminPassword,
+        role: "admin",
+        phone: "+91-9876543210",
+        address: "Connaught Place, New Delhi",
+        profilePicture: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+        isActive: true,
+        totalEarnings: 0,
+        totalOrders: 0,
+        totalSpent: 0
+      }
+    ];
+
+    // Indian names for customers
     const customerNames = [
       "Amit Sharma", "Priya Patel", "Rajesh Kumar", "Sunita Singh", "Vikram Gupta",
       "Anjali Desai", "Suresh Reddy", "Meera Joshi", "Arjun Nair", "Kavita Rao",
@@ -48,51 +84,45 @@ const seedData = async () => {
       "Sundar Rajagopal", "Meenakshi Sundaram", "Ranganathan Krishnan", "Valliappan Chidambaram", "Saravanan Muthusamy"
     ];
 
-    const restaurantOwnerNames = [
-      "Rajendra Prasad", "Lakshmi Devi", "Suresh Babu", "Meera Bai", "Arjun Singh",
-      "Priyanka Chopra", "Vikram Rathore", "Anjali Kumari", "Ravi Shankar", "Sunita Rani",
-      "Mohan Lal", "Kavita Sharma", "Deepak Kumar", "Sneha Patel", "Nitin Verma",
-      "Rekha Gupta", "Anil Yadav", "Kiran Joshi", "Vivek Agarwal", "Neha Tiwari"
-    ];
+    // Restaurant Owners (first 30 from a names list, or you can create names)
+    const ownerNames = ["Rajesh Sharma", "Priya Singh", "Vikram Kumar", "Anjali Patel", "Suresh Reddy", "Meera Verma", "Arjun Gupta", "Kavita Rao", "Ravi Joshi", "Poonam Agarwal", "Deepak Yadav", "Sneha Kapoor", "Manoj Tiwari", "Rekha Mishra", "Anil Choudhary", "Kiran Saxena", "Vivek Pandey", "Neha Jain", "Sanjay Bhatia", "Preeti Malhotra", "Rohit Khanna", "Alka Sinha", "Nitin Chopra", "Rashmi Iyer", "Karan Gill", "Pallavi Roy", "Aditya Bose", "Shweta Das", "Rahul Mukherjee", "Divya Chatterjee"];
 
     const users = [
-      {
-        name: "Admin User",
-        email: "admin@example.com",
-        password: hashedAdminPassword,
-        role: "admin",
-        phone: "+91-9876543210",
-        address: "Connaught Place, New Delhi",
-        isActive: true,
-      },
+      ...superAdminUsers,
+      ...systemAdminUsers,
       // Restaurant Owners
-      ...restaurantOwnerNames.map((name, index) => ({
+      ...ownerNames.map((name, index) => ({
         name,
-        email: `owner${index + 1}@example.com`,
+        email: `owner${index + 1}@foodhub.com`,
         password: hashedOwnerPassword,
         role: "restaurant",
         phone: `+91-98765432${10 + index}`,
-        address: `${['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata'][index % 5]}, India`,
+        address: `${['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur', 'Surat'][index % 10]}, India`,
+        profilePicture: `https://images.unsplash.com/photo-${1500000000000 + index}?w=150`,
         isActive: true,
+        totalEarnings: Math.floor(Math.random() * 50000) + 10000,
+        totalOrders: Math.floor(Math.random() * 100) + 20,
       })),
+
       // Customers
       ...customerNames.map((name, index) => ({
         name,
-        email: `customer${index + 1}@example.com`,
+        email: `customer${index + 1}@foodhub.com`,
         password: hashedCustomerPassword,
         role: "customer",
         phone: `+91-98765432${20 + index}`,
-        address: `${['Pune', 'Hyderabad', 'Ahmedabad', 'Jaipur', 'Surat'][index % 5]}, India`,
+        address: `${['Pune', 'Hyderabad', 'Ahmedabad', 'Jaipur', 'Surat', 'Chennai', 'Mumbai', 'Delhi', 'Bangalore', 'Kolkata'][index % 10]}, India`,
+        profilePicture: index % 3 === 0 ? `https://images.unsplash.com/photo-${1400000000000 + index}?w=150` : null,
         isActive: true,
-        totalOrders: Math.floor(Math.random() * 5),
-        totalSpent: Math.floor(Math.random() * 1000),
+        totalOrders: Math.floor(Math.random() * 15) + 1,
+        totalSpent: Math.floor(Math.random() * 5000) + 500,
       })),
     ];
 
     const createdUsers = await User.insertMany(users);
     console.log("✅ Users seeded");
 
-    // Sample Restaurants (20)
+    // Sample Restaurants (30 - added 10 more)
     const restaurantData = [
       { name: "Taj Mahal Restaurant", description: "Authentic Mughlai cuisine with royal flavors", address: "Gateway of India, Mumbai", image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400" },
       { name: "Spice Garden", description: "Fresh spices and traditional Indian dishes", address: "Connaught Place, Delhi", image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400" },
@@ -114,6 +144,17 @@ const seedData = async () => {
       { name: "Chhattisgarh Charm", description: "Central Indian flavors", address: "Raipur, Chhattisgarh", image: "https://images.unsplash.com/photo-1590845947670-c009801ffa74?w=400" },
       { name: "Madhya Pradesh Meals", description: "Diverse MP cuisine", address: "Khajuraho, Madhya Pradesh", image: "https://images.unsplash.com/photo-1544148103-0773bf10d330?w=400" },
       { name: "Telangana Treats", description: "Hyderabadi and Telangana specialties", address: "Hitech City, Hyderabad", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400" },
+      // 10 additional restaurants
+      { name: "Northeastern Delights", description: "Exotic flavors from Northeast India", address: "Shillong, Meghalaya", image: "https://images.unsplash.com/photo-1551782450-17144efb5723?w=400" },
+      { name: "Coastal Karnataka", description: "Seafood and coastal Karnataka cuisine", address: "Mangalore, Karnataka", image: "https://images.unsplash.com/photo-1586511925558-a4c6376fe65f?w=400" },
+      { name: "Marwari Magic", description: "Traditional Marwari Rajasthani food", address: "Jodhpur, Rajasthan", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400" },
+      { name: "Tamil Nadu Treasures", description: "Authentic Tamil cuisine and Chettinad dishes", address: "Madurai, Tamil Nadu", image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400" },
+      { name: "Maharashtrian Masala", description: "Punekar and Maharashtrian specialties", address: "Sinhagad Fort, Pune", image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400" },
+      { name: "Kashmiri Wazwan", description: "Royal Kashmiri multi-course meals", address: "Dal Lake, Srinagar", image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400" },
+      { name: "Andhra Spice Route", description: "Hot and spicy Andhra Pradesh cuisine", address: "Tirupati, Andhra Pradesh", image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400" },
+      { name: "Bengali Sweets & Savories", description: "Bengali mishti and traditional dishes", address: "Howrah Bridge, Kolkata", image: "https://images.unsplash.com/photo-1590845947670-c009801ffa74?w=400" },
+      { name: "Haryanvi Haveli", description: "Traditional Haryanvi and Punjabi fusion", address: "Chandigarh, Haryana", image: "https://images.unsplash.com/photo-1544148103-0773bf10d330?w=400" },
+      { name: "Uttar Pradesh Royal", description: "Awadhi and Mughlai cuisine from UP", address: "Taj Mahal, Agra", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400" },
     ];
 
     const restaurants = restaurantData.map((rest, index) => ({
@@ -139,21 +180,231 @@ const seedData = async () => {
     const foodItemsData = [];
 
     const sampleFoods = [
-      { name: "Butter Chicken", description: "Creamy tomato-based curry with tender chicken", price: 280, category: "Main Course", image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae391?w=300" },
-      { name: "Paneer Tikka Masala", description: "Grilled paneer in spicy tomato gravy", price: 250, category: "Main Course", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300" },
-      { name: "Hyderabadi Biryani", description: "Fragrant basmati rice with marinated meat", price: 320, category: "Main Course", image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=300" },
-      { name: "Masala Dosa", description: "Crispy crepe filled with potato masala", price: 120, category: "Main Course", image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=300" },
-      { name: "Fish Curry", description: "Tangy fish curry with coconut milk", price: 300, category: "Main Course", image: "https://images.unsplash.com/photo-1551782450-17144efb5723?w=300" },
-      { name: "Chana Masala", description: "Spicy chickpea curry", price: 180, category: "Main Course", image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=300" },
-      { name: "Samosa", description: "Crispy pastry filled with spiced potatoes", price: 40, category: "Appetizers", image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=300" },
-      { name: "Pakora", description: "Deep-fried vegetable fritters", price: 60, category: "Appetizers", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=300" },
-      { name: "Ras Malai", description: "Soft cheese dumplings in sweetened milk", price: 80, category: "Desserts", image: "https://images.unsplash.com/photo-1586511925558-a4c6376fe65f?w=300" },
-      { name: "Gulab Jamun", description: "Warm milk dumplings in rose syrup", price: 70, category: "Desserts", image: "https://images.unsplash.com/photo-1544148103-0773bf10d330?w=300" },
-      { name: "Lassi", description: "Yogurt-based drink, sweet or salty", price: 50, category: "Beverages", image: "https://images.unsplash.com/photo-1590845947670-c009801ffa74?w=300" },
-      { name: "Masala Chai", description: "Spiced tea with milk", price: 30, category: "Beverages", image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300" },
-      { name: "Naan", description: "Soft Indian bread", price: 25, category: "Sides", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300" },
-      { name: "Jeera Rice", description: "Cumin-flavored basmati rice", price: 80, category: "Sides", image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=300" },
-      { name: "Raita", description: "Yogurt with cucumber and spices", price: 40, category: "Sides", image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=300" },
+      // Main Courses
+      {
+        name: "Butter Chicken",
+        description: "Creamy tomato-based curry with tender chicken, served with basmati rice. A rich, flavorful dish with aromatic spices.",
+        price: 280,
+        category: "Main Course",
+        image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae391?w=300",
+        calories: 450,
+        isVegetarian: false,
+        isVegan: false,
+        spiceLevel: "Medium",
+        allergens: ["Dairy", "Chicken"]
+      },
+      {
+        name: "Paneer Tikka Masala",
+        description: "Grilled paneer cubes in a spicy tomato-based gravy with bell peppers and onions. Served with jeera rice.",
+        price: 250,
+        category: "Main Course",
+        image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300",
+        calories: 380,
+        isVegetarian: true,
+        isVegan: false,
+        spiceLevel: "Medium-High",
+        allergens: ["Dairy"]
+      },
+      {
+        name: "Hyderabadi Biryani",
+        description: "Fragrant basmati rice layered with marinated chicken, caramelized onions, boiled eggs, and saffron. A royal dish.",
+        price: 320,
+        category: "Main Course",
+        image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=300",
+        calories: 520,
+        isVegetarian: false,
+        isVegan: false,
+        spiceLevel: "Medium",
+        allergens: ["Eggs"]
+      },
+      {
+        name: "Masala Dosa",
+        description: "Crispy fermented crepe filled with potato masala, served with sambar and coconut chutney.",
+        price: 120,
+        category: "Main Course",
+        image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=300",
+        calories: 320,
+        isVegetarian: true,
+        isVegan: true,
+        spiceLevel: "Low",
+        allergens: ["Gluten"]
+      },
+      {
+        name: "Fish Curry",
+        description: "Fresh fish simmered in tangy tamarind and coconut curry with traditional South Indian spices.",
+        price: 300,
+        category: "Main Course",
+        image: "https://images.unsplash.com/photo-1551782450-17144efb5723?w=300",
+        calories: 280,
+        isVegetarian: false,
+        isVegan: false,
+        spiceLevel: "High",
+        allergens: ["Fish", "Coconut"]
+      },
+      {
+        name: "Chana Masala",
+        description: "Chickpeas cooked in a spicy tomato-based gravy with garam masala and fresh cilantro.",
+        price: 180,
+        category: "Main Course",
+        image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=300",
+        calories: 220,
+        isVegetarian: true,
+        isVegan: true,
+        spiceLevel: "Medium",
+        allergens: []
+      },
+
+      // Appetizers
+      {
+        name: "Punjabi Samosa",
+        description: "Crispy pastry filled with spiced potatoes, peas, and green chilies. Served with tamarind chutney.",
+        price: 40,
+        category: "Appetizers",
+        image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=300",
+        calories: 180,
+        isVegetarian: true,
+        isVegan: true,
+        spiceLevel: "Medium",
+        allergens: ["Gluten"]
+      },
+      {
+        name: "Paneer Pakora",
+        description: "Deep-fried paneer fritters coated in spiced chickpea batter. Perfect crispy starter.",
+        price: 80,
+        category: "Appetizers",
+        image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=300",
+        calories: 240,
+        isVegetarian: true,
+        isVegan: false,
+        spiceLevel: "Low",
+        allergens: ["Dairy", "Gluten"]
+      },
+      {
+        name: "Chicken 65",
+        description: "Spicy, deep-fried chicken bites marinated in red chili, curry leaves, and South Indian spices.",
+        price: 150,
+        category: "Appetizers",
+        image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300",
+        calories: 320,
+        isVegetarian: false,
+        isVegan: false,
+        spiceLevel: "High",
+        allergens: ["Chicken"]
+      },
+
+      // Desserts
+      {
+        name: "Ras Malai",
+        description: "Soft cheese dumplings soaked in sweetened cardamom-flavored milk. A Bengali delicacy.",
+        price: 80,
+        category: "Desserts",
+        image: "https://images.unsplash.com/photo-1586511925558-a4c6376fe65f?w=300",
+        calories: 150,
+        isVegetarian: true,
+        isVegan: false,
+        spiceLevel: "None",
+        allergens: ["Dairy"]
+      },
+      {
+        name: "Gulab Jamun",
+        description: "Warm milk dumplings soaked in rose-flavored sugar syrup. Served hot.",
+        price: 70,
+        category: "Desserts",
+        image: "https://images.unsplash.com/photo-1544148103-0773bf10d330?w=300",
+        calories: 180,
+        isVegetarian: true,
+        isVegan: false,
+        spiceLevel: "None",
+        allergens: ["Dairy"]
+      },
+      {
+        name: "Rasgulla",
+        description: "Spongy cheese balls in light sugar syrup. A traditional Bengali sweet.",
+        price: 60,
+        category: "Desserts",
+        image: "https://images.unsplash.com/photo-1590845947670-c009801ffa74?w=300",
+        calories: 120,
+        isVegetarian: true,
+        isVegan: false,
+        spiceLevel: "None",
+        allergens: ["Dairy"]
+      },
+
+      // Beverages
+      {
+        name: "Sweet Lassi",
+        description: "Thick yogurt drink sweetened with sugar and flavored with cardamom. Refreshing and creamy.",
+        price: 50,
+        category: "Beverages",
+        image: "https://images.unsplash.com/photo-1551782450-17144efb5723?w=300",
+        calories: 180,
+        isVegetarian: true,
+        isVegan: false,
+        spiceLevel: "None",
+        allergens: ["Dairy"]
+      },
+      {
+        name: "Masala Chai",
+        description: "Traditional Indian spiced tea with ginger, cardamom, cloves, and cinnamon. Served hot.",
+        price: 30,
+        category: "Beverages",
+        image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300",
+        calories: 80,
+        isVegetarian: true,
+        isVegan: true,
+        spiceLevel: "Low",
+        allergens: []
+      },
+      {
+        name: "Fresh Lime Soda",
+        description: "Sparkling lemon drink with mint leaves and a hint of salt. Perfect summer refresher.",
+        price: 40,
+        category: "Beverages",
+        image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=300",
+        calories: 45,
+        isVegetarian: true,
+        isVegan: true,
+        spiceLevel: "None",
+        allergens: []
+      },
+
+      // Sides
+      {
+        name: "Butter Naan",
+        description: "Soft, fluffy Indian bread brushed with butter. Perfect accompaniment to curries.",
+        price: 25,
+        category: "Sides",
+        image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300",
+        calories: 150,
+        isVegetarian: true,
+        isVegan: false,
+        spiceLevel: "None",
+        allergens: ["Gluten", "Dairy"]
+      },
+      {
+        name: "Jeera Rice",
+        description: "Basmati rice tempered with cumin seeds and ghee. Aromatic and flavorful.",
+        price: 80,
+        category: "Sides",
+        image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=300",
+        calories: 200,
+        isVegetarian: true,
+        isVegan: false,
+        spiceLevel: "Low",
+        allergens: ["Dairy"]
+      },
+      {
+        name: "Mixed Vegetable Raita",
+        description: "Yogurt with cucumber, tomatoes, and mild spices. Cooling accompaniment to spicy dishes.",
+        price: 40,
+        category: "Sides",
+        image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=300",
+        calories: 90,
+        isVegetarian: true,
+        isVegan: false,
+        spiceLevel: "Low",
+        allergens: ["Dairy"]
+      }
     ];
 
     for (let i = 0; i < createdRestaurants.length; i++) {

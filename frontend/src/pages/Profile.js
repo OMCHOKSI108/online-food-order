@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { BsCheck, BsBox, BsShieldLock, BsDoorOpen } from "react-icons/bs";
+import '../Profile.css';
 
 export default function Profile() {
   const { user, logout } = useAuth();
@@ -64,205 +66,171 @@ export default function Profile() {
   };
 
   return (
-    <div className="container my-5">
-      <div className="row">
-        <div className="col-md-8 offset-md-2">
-          <div className="card shadow-lg">
-            <div className="card-header bg-primary text-white">
-              <h3 className="mb-0">👤 My Profile</h3>
+    <div className="profile-page">
+      <div className="profile-card">
+        <div className="profile-header">
+          <div className="profile-avatar">
+            <div className="rounded-circle d-flex align-items-center justify-content-center">
+              <span>
+                {formData.name ? formData.name.charAt(0).toUpperCase() : "U"}
+              </span>
             </div>
-            <div className="card-body">
-              {message && (
-                <div className={`alert alert-${message.type}`}>
-                  {message.text}
-                </div>
-              )}
-
-              <div className="row mb-4">
-                <div className="col-md-4 text-center">
-                  <div className="profile-avatar">
-                    <div
-                      className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
-                      style={{ width: "120px", height: "120px", margin: "auto" }}
-                    >
-                      <span style={{ fontSize: "48px" }}>
-                        {formData.name ? formData.name.charAt(0).toUpperCase() : "U"}
-                      </span>
-                    </div>
-                  </div>
-                  <p className="mt-3">
-                    <strong>{user?.role?.toUpperCase()}</strong>
-                  </p>
-                </div>
-
-                <div className="col-md-8">
-                  <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                      <label className="form-label">Full Name</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                      />
-                    </div>
-
-                    <div className="mb-3">
-                      <label className="form-label">Email</label>
-                      <input
-                        type="email"
-                        className="form-control"
-                        name="email"
-                        value={formData.email}
-                        disabled
-                      />
-                      <small className="text-muted">
-                        Email cannot be changed
-                      </small>
-                    </div>
-
-                    <div className="mb-3">
-                      <label className="form-label">Phone Number</label>
-                      <input
-                        type="tel"
-                        className="form-control"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        placeholder="10-digit mobile number"
-                      />
-                    </div>
-
-                    <div className="mb-3">
-                      <label className="form-label">Address</label>
-                      <textarea
-                        className="form-control"
-                        name="address"
-                        value={formData.address}
-                        onChange={handleChange}
-                        rows="3"
-                        placeholder="Enter your full address"
-                      ></textarea>
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="btn btn-primary w-100"
-                      disabled={loading}
-                    >
-                      {loading ? "Updating..." : "✓ Update Profile"}
-                    </button>
-                  </form>
-                </div>
-              </div>
-
-              <hr />
-
-              <h5 className="mt-4">Account Statistics</h5>
-              <div className="row">
-                <div className="col-md-4">
-                  <div className="card text-center">
-                    <div className="card-body">
-                      <h6 className="text-muted">Total Orders</h6>
-                      <h3>{user?.totalOrders || 0}</h3>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-md-4">
-                  <div className="card text-center">
-                    <div className="card-body">
-                      <h6 className="text-muted">Total Spent</h6>
-                      <h3>₹{user?.totalSpent || 0}</h3>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-md-4">
-                  <div className="card text-center">
-                    <div className="card-body">
-                      <h6 className="text-muted">Member Since</h6>
-                      <p>
-                        {user?.createdAt
-                          ? new Date(user.createdAt).toLocaleDateString()
-                          : "N/A"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <hr />
-
-              <h5 className="mt-4">Account Actions</h5>
-              <div className="row">
-                <div className="col-md-6">
-                  <button
-                    className="btn btn-info w-100"
-                    onClick={() => navigate("/order-history")}
-                  >
-                    📦 View Orders
-                  </button>
-                </div>
-                <div className="col-md-6">
-                  <button
-                    className="btn btn-warning w-100"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    🔐 Change Password
-                  </button>
-                </div>
-              </div>
-
-              {showPassword && (
-                <div className="card mt-3 border-warning">
-                  <div className="card-body">
-                    <form>
-                      <div className="mb-3">
-                        <label className="form-label">Current Password</label>
-                        <input
-                          type="password"
-                          className="form-control"
-                          placeholder="Enter current password"
-                        />
-                      </div>
-                      <div className="mb-3">
-                        <label className="form-label">New Password</label>
-                        <input
-                          type="password"
-                          className="form-control"
-                          placeholder="Enter new password"
-                        />
-                      </div>
-                      <div className="mb-3">
-                        <label className="form-label">Confirm Password</label>
-                        <input
-                          type="password"
-                          className="form-control"
-                          placeholder="Confirm new password"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        className="btn btn-warning w-100"
-                        onClick={() => setShowPassword(false)}
-                      >
-                        Update Password
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              )}
-
-              <hr />
-
-              <button
-                className="btn btn-danger w-100 mt-3"
-                onClick={handleLogout}
-              >
-                🚪 Logout
-              </button>
-            </div>
+            <p>{user?.role?.toUpperCase()}</p>
           </div>
+          <div className="profile-info">
+            <h4>{user?.name}</h4>
+            <p>{user?.email}</p>
+            <small>Member since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}</small>
+          </div>
+        </div>
+
+        {message && (
+          <div className={`alert alert-${message.type} mb-4`}>
+            {message.text}
+          </div>
+        )}
+
+        <form className="profile-form-grid" onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label className="form-label">Full Name</label>
+            <input
+              type="text"
+              className="form-control"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">Email</label>
+            <input
+              type="email"
+              className="form-control"
+              name="email"
+              value={formData.email}
+              disabled
+            />
+            <small className="text-muted">Email cannot be changed</small>
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">Phone Number</label>
+            <input
+              type="tel"
+              className="form-control"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="10-digit mobile number"
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">Address</label>
+            <textarea
+              className="form-control"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              rows="3"
+              placeholder="Enter your full address"
+            ></textarea>
+          </div>
+
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={loading}
+          >
+            {loading ? "Updating..." : (
+              <>
+                <BsCheck className="me-1" />
+                Update Profile
+              </>
+            )}
+          </button>
+        </form>
+
+        <div className="profile-stats">
+          <div className="profile-stat-card">
+            <h6>Total Orders</h6>
+            <h3>{user?.totalOrders || 0}</h3>
+          </div>
+          <div className="profile-stat-card">
+            <h6>Total Spent</h6>
+            <h3>₹{user?.totalSpent || 0}</h3>
+          </div>
+          <div className="profile-stat-card">
+            <h6>Member Since</h6>
+            <p>{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}</p>
+          </div>
+        </div>
+
+        <div className="profile-actions">
+          <h5>Account Actions</h5>
+          <div>
+            <button
+              className="btn-outline"
+              onClick={() => navigate("/orders")}
+            >
+              <BsBox className="me-1" />
+              View Orders
+            </button>
+            <button
+              className="btn-outline"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              <BsShieldLock className="me-1" />
+              Change Password
+            </button>
+          </div>
+
+          {showPassword && (
+            <div className="password-form">
+              <form>
+                <div className="mb-3">
+                  <label className="form-label">Current Password</label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    placeholder="Enter current password"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">New Password</label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    placeholder="Enter new password"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Confirm Password</label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    placeholder="Confirm new password"
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-warning w-100"
+                  onClick={() => setShowPassword(false)}
+                >
+                  Update Password
+                </button>
+              </form>
+            </div>
+          )}
+
+          <button
+            className="btn btn-danger"
+            onClick={handleLogout}
+          >
+            <BsDoorOpen className="me-1" />
+            Logout
+          </button>
         </div>
       </div>
     </div>

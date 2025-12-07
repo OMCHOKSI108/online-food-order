@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
 import adminService from "../../services/adminService";
+import { BsArrowLeft, BsGraphUp, BsBarChart, BsStar, BsCash } from "react-icons/bs";
 
 export default function AdminReports() {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("revenue");
   const [loading, setLoading] = useState(true);
@@ -14,23 +13,27 @@ export default function AdminReports() {
   const [topDishes, setTopDishes] = useState([]);
   const [stats, setStats] = useState(null);
 
-  useEffect(() => {
-    fetchReports();
-  }, [activeTab]);
-
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     try {
       setLoading(true);
 
       if (activeTab === "revenue") {
         const response = await adminService.getRevenueReport();
-        setRevenueReport(response.data.report);
+        setRevenueReport(response.data);
       } else if (activeTab === "restaurants") {
+        console.log("Fetching top restaurants...");
         const response = await adminService.getTopRestaurants();
-        setTopRestaurants(response.data.restaurants || []);
+        console.log("Top restaurants response:", response);
+        console.log("Top restaurants data:", response.data);
+        setTopRestaurants(response.data.topRestaurants || []);
+        console.log("Set top restaurants to:", response.data.topRestaurants || []);
       } else if (activeTab === "dishes") {
+        console.log("Fetching top dishes...");
         const response = await adminService.getTopDishes();
-        setTopDishes(response.data.dishes || []);
+        console.log("Top dishes response:", response);
+        console.log("Top dishes data:", response.data);
+        setTopDishes(response.data.topDishes || []);
+        console.log("Set top dishes to:", response.data.topDishes || []);
       } else if (activeTab === "stats") {
         const response = await adminService.getStatistics();
         setStats(response.data.stats);
@@ -40,7 +43,11 @@ export default function AdminReports() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTab]);
+
+  useEffect(() => {
+    fetchReports();
+  }, [fetchReports]);
 
   if (loading) {
     return (
@@ -58,14 +65,15 @@ export default function AdminReports() {
     <div className="container-fluid my-4">
       <div className="row mb-4">
         <div className="col">
-          <h2>📊 Reports & Analytics</h2>
+          <h2><BsBarChart className="me-2" /> Reports & Analytics</h2>
         </div>
         <div className="col text-end">
           <button
             className="btn btn-primary"
             onClick={() => navigate("/admin/dashboard")}
           >
-            ⬅️ Back to Dashboard
+            <BsArrowLeft className="me-2" />
+            Back to Dashboard
           </button>
         </div>
       </div>
@@ -88,7 +96,8 @@ export default function AdminReports() {
                 fetchReports();
               }}
             >
-              💰 Revenue Report
+              <BsCash className="me-2" />
+              Revenue Report
             </button>
             <button
               type="button"
@@ -126,7 +135,8 @@ export default function AdminReports() {
                 fetchReports();
               }}
             >
-              📈 Statistics
+              <BsGraphUp className="me-2" />
+              Statistics
             </button>
           </div>
         </div>
@@ -137,7 +147,7 @@ export default function AdminReports() {
           <div className="col-12">
             <div className="card shadow-lg">
               <div className="card-header bg-success text-white">
-                <h5 className="mb-0">💰 Revenue Report</h5>
+                <h5 className="mb-0"><BsCash className="me-2" /> Revenue Report</h5>
               </div>
               <div className="card-body">
                 <div className="row mb-4">
@@ -237,17 +247,17 @@ export default function AdminReports() {
                   </div>
                   <div className="card-body">
                     <p>
-                      <strong>Rating:</strong> ⭐{restaurant.rating}
+                      <strong>Rating:</strong> <BsStar className="me-1" />{restaurant.rating}
                     </p>
                     <p>
-                      <strong>Orders:</strong> {restaurant.orderCount}
+                      <strong>Orders:</strong> {restaurant.totalOrders}
                     </p>
                     <p>
-                      <strong>Revenue:</strong> ₹{restaurant.revenue}
+                      <strong>Revenue:</strong> ₹{restaurant.totalEarnings}
                     </p>
                     <p>
                       <strong>Avg Order Value:</strong> ₹
-                      {(restaurant.revenue / restaurant.orderCount).toFixed(2)}
+                      {restaurant.totalOrders > 0 ? (restaurant.totalEarnings / restaurant.totalOrders).toFixed(2) : 0}
                     </p>
                   </div>
                 </div>
@@ -289,10 +299,10 @@ export default function AdminReports() {
                               <strong>{idx + 1}</strong>
                             </td>
                             <td>{dish.name}</td>
-                            <td>{dish.restaurantName}</td>
-                            <td>{dish.orderCount}</td>
+                            <td>{dish.restaurant || 'N/A'}</td>
+                            <td>{dish.totalOrders}</td>
                             <td>₹{dish.revenue}</td>
-                            <td>⭐{dish.rating}</td>
+                            <td>{dish.rating || 'N/A'}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -314,7 +324,7 @@ export default function AdminReports() {
           <div className="col-12">
             <div className="card shadow-lg mb-4">
               <div className="card-header bg-warning text-white">
-                <h5 className="mb-0">📈 System Statistics</h5>
+                <h5 className="mb-0"><BsGraphUp className="me-2" /> System Statistics</h5>
               </div>
               <div className="card-body">
                 <div className="row">

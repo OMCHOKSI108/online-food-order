@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
 import restaurantService from "../../services/restaurantService";
+import { GiForkKnifeSpoon } from "react-icons/gi";
+import { BsCheck, BsClipboard } from "react-icons/bs";
 
 export default function RestaurantSetup() {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -31,7 +31,7 @@ export default function RestaurantSetup() {
       setLoading(true);
       setError(null);
 
-      const response = await restaurantService.registerRestaurant(formData);
+      await restaurantService.registerRestaurant(formData);
       alert(
         "Restaurant registered successfully! Awaiting admin approval."
       );
@@ -49,7 +49,10 @@ export default function RestaurantSetup() {
         <div className="col-md-8 offset-md-2">
           <div className="card shadow-lg">
             <div className="card-header bg-success text-white">
-              <h3 className="mb-0">🍴 Restaurant Registration</h3>
+              <h3 className="mb-0">
+                <GiForkKnifeSpoon className="me-2" />
+                Restaurant Registration
+              </h3>
             </div>
             <div className="card-body">
               {error && <div className="alert alert-danger">{error}</div>}
@@ -152,7 +155,12 @@ export default function RestaurantSetup() {
                   className="btn btn-success btn-lg w-100"
                   disabled={loading}
                 >
-                  {loading ? "Registering..." : "✓ Register Restaurant"}
+                  {loading ? "Registering..." : (
+                    <>
+                      <BsCheck className="me-2" />
+                      Register Restaurant
+                    </>
+                  )}
                 </button>
 
                 <button
@@ -167,7 +175,10 @@ export default function RestaurantSetup() {
           </div>
 
           <div className="alert alert-warning mt-4">
-            <h6>📋 Required Information</h6>
+            <h6>
+              <BsClipboard className="me-2" />
+              Required Information
+            </h6>
             <ul>
               <li>Valid restaurant name and description</li>
               <li>Accurate address for food delivery</li>

@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
 import orderService from "../services/orderService";
+import { BsBox, BsBuilding, BsStar, BsCreditCard, BsX, BsArrowLeft, BsFileText, BsCheck, BsClipboard, BsTruck } from "react-icons/bs";
+import { GiChefToque } from "react-icons/gi";
 
 export default function OrderDetails() {
-  const { orderId } = useParams();
+  const { id: orderId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showReview, setShowReview] = useState(false);
   const [reviewData, setReviewData] = useState({
     rating: 5,
     comment: "",
@@ -18,21 +17,36 @@ export default function OrderDetails() {
   });
   const [submittingReview, setSubmittingReview] = useState(false);
 
-  useEffect(() => {
-    fetchOrderDetails();
-  }, [orderId]);
-
-  const fetchOrderDetails = async () => {
+  const fetchOrderDetails = useCallback(async () => {
     try {
       setLoading(true);
+      console.log("Fetching order details for ID:", orderId);
       const response = await orderService.getOrderDetails(orderId);
-      setOrder(response.data.order);
+      console.log("Order details response:", response);
+      setOrder(response.data);
     } catch (err) {
+      console.error("Error fetching order details:", err);
       setError("Failed to load order details");
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId]);
+
+  useEffect(() => {
+    console.log("=== ORDER DETAILS COMPONENT ===");
+    console.log("Order ID from params:", orderId);
+    console.log("Order ID type:", typeof orderId);
+    console.log("Order ID length:", orderId?.length);
+    
+    if (!orderId || orderId === 'undefined') {
+      console.error("Invalid order ID:", orderId);
+      setError("Invalid order ID");
+      setLoading(false);
+      return;
+    }
+    
+    fetchOrderDetails();
+  }, [orderId, fetchOrderDetails]);
 
   const handleCancelOrder = async () => {
     if (window.confirm("Are you sure you want to cancel this order?")) {
@@ -58,7 +72,6 @@ export default function OrderDetails() {
         foodItem: foodItemId,
       });
       alert("Review submitted successfully!");
-      setShowReview(false);
       fetchOrderDetails();
     } catch (err) {
       setError("Failed to submit review");
@@ -114,7 +127,10 @@ export default function OrderDetails() {
         <div className="col-md-8">
           <div className="card shadow-lg mb-4">
             <div className="card-header bg-primary text-white">
-              <h3 className="mb-0">📦 Order #{order._id.substring(0, 8)}</h3>
+              <h3 className="mb-0">
+                <BsBox className="me-2" />
+                Order #{order._id.substring(0, 8)}
+              </h3>
             </div>
             <div className="card-body">
               <div className="row mb-4">
@@ -203,7 +219,10 @@ export default function OrderDetails() {
 
           <div className="card shadow-lg mb-4">
             <div className="card-header bg-info text-white">
-              <h5 className="mb-0">🏪 Delivery Details</h5>
+              <h5 className="mb-0">
+                <BsBuilding className="me-2" />
+                Delivery Details
+              </h5>
             </div>
             <div className="card-body">
               <h6>Restaurant</h6>
@@ -223,7 +242,10 @@ export default function OrderDetails() {
           {canReview && (
             <div className="card shadow-lg mb-4">
               <div className="card-header bg-success text-white">
-                <h5 className="mb-0">⭐ Rate Your Order</h5>
+                <h5 className="mb-0">
+                  <BsStar className="me-2" />
+                  Rate Your Order
+                </h5>
               </div>
               <div className="card-body">
                 <div className="mb-3">
@@ -244,7 +266,7 @@ export default function OrderDetails() {
                   <div className="text-center">
                     {Array.from({ length: reviewData.rating }).map((_, i) => (
                       <span key={i} className="text-warning">
-                        ⭐
+                        <BsStar />
                       </span>
                     ))}
                   </div>
@@ -288,7 +310,8 @@ export default function OrderDetails() {
                   className="btn btn-primary"
                   onClick={() => navigate(`/payment/${orderId}`)}
                 >
-                  💳 Complete Payment
+                  <BsCreditCard className="me-1" />
+                  Complete Payment
                 </button>
               )}
 
@@ -298,15 +321,17 @@ export default function OrderDetails() {
                   onClick={handleCancelOrder}
                   disabled={loading}
                 >
-                  ❌ Cancel Order
+                  <BsX className="me-1" />
+                  Cancel Order
                 </button>
               )}
 
               <button
                 className="btn btn-info"
-                onClick={() => navigate("/order-history")}
+                onClick={() => navigate("/orders")}
               >
-                ⬅️ Back to Orders
+                <BsArrowLeft className="me-1" />
+                Back to Orders
               </button>
 
               <button
@@ -320,7 +345,8 @@ export default function OrderDetails() {
                   }
                 }}
               >
-                📄 Download Receipt
+                <BsFileText className="me-1" />
+                Download Receipt
               </button>
             </div>
           </div>
@@ -330,7 +356,9 @@ export default function OrderDetails() {
               <h6>Order Timeline</h6>
               <div className="timeline">
                 <div className="timeline-item">
-                  <div className="badge bg-success">✓</div>
+                  <div className="badge bg-success">
+                    <BsCheck />
+                  </div>
                   <span>Order Placed</span>
                 </div>
                 <div
@@ -338,7 +366,9 @@ export default function OrderDetails() {
                     order.status !== "pending" ? "completed" : ""
                   }`}
                 >
-                  <div className="badge bg-info">📋</div>
+                  <div className="badge bg-info">
+                    <BsClipboard />
+                  </div>
                   <span>Confirmed</span>
                 </div>
                 <div
@@ -349,7 +379,9 @@ export default function OrderDetails() {
                       : ""
                   }`}
                 >
-                  <div className="badge bg-warning">👨‍🍳</div>
+                  <div className="badge bg-warning">
+                    <GiChefToque />
+                  </div>
                   <span>Preparing</span>
                 </div>
                 <div
@@ -357,7 +389,9 @@ export default function OrderDetails() {
                     order.status === "delivered" ? "completed" : ""
                   }`}
                 >
-                  <div className="badge bg-primary">🚚</div>
+                  <div className="badge bg-primary">
+                    <BsTruck />
+                  </div>
                   <span>On The Way</span>
                 </div>
                 <div
@@ -365,7 +399,9 @@ export default function OrderDetails() {
                     order.status === "delivered" ? "completed" : ""
                   }`}
                 >
-                  <div className="badge bg-success">✓</div>
+                  <div className="badge bg-success">
+                    <BsCheck />
+                  </div>
                   <span>Delivered</span>
                 </div>
               </div>

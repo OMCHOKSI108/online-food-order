@@ -1,28 +1,33 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
 import restaurantService from "../../services/restaurantService";
+import { BsBox, BsArrowLeft, BsCheck, BsX, BsTruck } from "react-icons/bs";
+import { GiChefToque } from "react-icons/gi";
 
 export default function RestaurantOrders() {
-  const { user } = useAuth();
   const navigate = useNavigate();
+  // eslint-disable-next-line no-unused-vars
+  const [restaurant, setRestaurant] = useState(null);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedOrder, setSelectedOrder] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
 
   useEffect(() => {
-    fetchOrders();
+    fetchData();
   }, []);
 
-  const fetchOrders = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await restaurantService.getRestaurantOrders();
-      setOrders(response.data.orders || []);
+      const restaurantRes = await restaurantService.getMyRestaurant();
+      setRestaurant(restaurantRes.data);
+      if (restaurantRes.data.approvalStatus === "approved") {
+        const ordersRes = await restaurantService.getRestaurantOrders();
+        setOrders(ordersRes.data.orders || []);
+      }
     } catch (err) {
-      setError("Failed to load orders");
+      setError("Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -32,7 +37,7 @@ export default function RestaurantOrders() {
     try {
       await restaurantService.acceptOrder(orderId);
       alert("Order accepted!");
-      fetchOrders();
+      fetchData();
     } catch (err) {
       alert("Failed to accept order");
     }
@@ -44,7 +49,7 @@ export default function RestaurantOrders() {
       try {
         await restaurantService.rejectOrder(orderId, { reason });
         alert("Order rejected!");
-        fetchOrders();
+        fetchData();
       } catch (err) {
         alert("Failed to reject order");
       }
@@ -55,7 +60,7 @@ export default function RestaurantOrders() {
     try {
       await restaurantService.updateOrderStatus(orderId, { status });
       alert("Order status updated!");
-      fetchOrders();
+      fetchData();
     } catch (err) {
       alert("Failed to update order status");
     }
@@ -95,14 +100,18 @@ export default function RestaurantOrders() {
     <div className="container-fluid my-4">
       <div className="row mb-4">
         <div className="col">
-          <h2>📦 Order Management</h2>
+          <h2>
+            <BsBox className="me-2" />
+            Order Management
+          </h2>
         </div>
         <div className="col text-end">
           <button
             className="btn btn-primary"
             onClick={() => navigate("/restaurant/dashboard")}
           >
-            ⬅️ Back
+            <BsArrowLeft className="me-1" />
+            Back
           </button>
         </div>
       </div>
@@ -233,13 +242,15 @@ export default function RestaurantOrders() {
                           className="btn btn-success btn-sm"
                           onClick={() => handleAcceptOrder(order._id)}
                         >
-                          ✓ Accept Order
+                          <BsCheck className="me-1" />
+                          Accept Order
                         </button>
                         <button
                           className="btn btn-danger btn-sm"
                           onClick={() => handleRejectOrder(order._id)}
                         >
-                          ✗ Reject Order
+                          <BsX className="me-1" />
+                          Reject Order
                         </button>
                       </>
                     )}
@@ -251,7 +262,8 @@ export default function RestaurantOrders() {
                           handleUpdateStatus(order._id, "preparing")
                         }
                       >
-                        👨‍🍳 Mark as Preparing
+                        <GiChefToque className="me-1" />
+                        Mark as Preparing
                       </button>
                     )}
 
@@ -262,7 +274,8 @@ export default function RestaurantOrders() {
                           handleUpdateStatus(order._id, "on_the_way")
                         }
                       >
-                        🚚 Mark as On The Way
+                        <BsTruck className="me-1" />
+                        Mark as On The Way
                       </button>
                     )}
 
@@ -273,7 +286,8 @@ export default function RestaurantOrders() {
                           handleUpdateStatus(order._id, "delivered")
                         }
                       >
-                        ✓ Mark as Delivered
+                        <BsCheck className="me-1" />
+                        Mark as Delivered
                       </button>
                     )}
                   </div>
