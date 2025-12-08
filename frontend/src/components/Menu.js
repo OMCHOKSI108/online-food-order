@@ -8,7 +8,7 @@ const Menu = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/restaurants/${id}/menu`)
+      .get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/restaurants/${id}/menu`)
       .then(res => setMenu(res.data))
       .catch(err => console.error(err));
   }, [id]);

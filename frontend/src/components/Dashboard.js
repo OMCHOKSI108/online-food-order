@@ -10,7 +10,7 @@ const Dashboard = () => {
     const token = localStorage.getItem("token");
     if (!token) return navigate("/login");
 
-    axios.get("http://localhost:5000/api/auth/me", {
+    axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     .then(res => setUser(res.data))

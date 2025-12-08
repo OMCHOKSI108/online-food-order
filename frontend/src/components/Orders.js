@@ -9,7 +9,7 @@ const Orders = () => {
     if (!token) return;
 
     axios
-      .get("http://localhost:5000/api/orders", {
+      .get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/orders`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(res => setOrders(res.data))

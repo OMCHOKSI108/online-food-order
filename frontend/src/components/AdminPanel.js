@@ -6,13 +6,13 @@ const AdminPanel = () => {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/restaurants")
+    axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/restaurants`)
       .then(res => setRestaurants(res.data))
       .catch(err => console.error(err));
 
     const token = localStorage.getItem("token");
     if (token) {
-      axios.get("http://localhost:5000/api/orders", {
+      axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/orders`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(res => setOrders(res.data))

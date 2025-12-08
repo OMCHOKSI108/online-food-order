@@ -52,7 +52,7 @@ export default function Profile() {
   const fetchUserStats = async () => {
     try {
       setStatsLoading(true);
-      const response = await fetch('http://localhost:5000/api/auth/me/stats', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/auth/me/stats`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
