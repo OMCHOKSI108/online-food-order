@@ -57,7 +57,8 @@ export default function OrderDetails() {
         alert("Order cancelled successfully. Refund will be processed.");
         fetchOrderDetails();
       } catch (err) {
-        setError("Failed to cancel order");
+        const errorMessage = err.response?.data?.message || "Failed to cancel order";
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -114,9 +115,7 @@ export default function OrderDetails() {
   };
 
   const canCancelOrder =
-    order.status !== "delivered" &&
-    order.status !== "cancelled" &&
-    order.status !== "rejected";
+    ["pending", "accepted", "confirmed"].includes(order.status);
   const canReview = order.status === "delivered" && !order.rating;
 
   return (

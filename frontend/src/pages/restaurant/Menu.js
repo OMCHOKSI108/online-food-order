@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import restaurantService from "../../services/restaurantService";
-import { BsClipboard,BsStar, BsArrowLeft, BsPlus, BsPencil, BsCheck, BsTrash } from "react-icons/bs";
+import { BsClipboard, BsStar, BsArrowLeft, BsPlus, BsPencil, BsCheck, BsTrash, BsX, BsImage } from "react-icons/bs";
+import "./RestaurantMenu.css";
 
 export default function RestaurantMenu() {
   const navigate = useNavigate();
@@ -98,10 +99,11 @@ export default function RestaurantMenu() {
 
   if (loading) {
     return (
-      <div className="container my-5">
-        <div className="text-center">
-          <div className="spinner-border" role="status">
-            <span className="visually-hidden">Loading...</span>
+      <div className="restaurant-menu-container">
+        <div className="restaurant-menu-wrapper">
+          <div className="menu-loading">
+            <div className="spinner"></div>
+            <p>Loading your menu...</p>
           </div>
         </div>
       </div>
@@ -110,265 +112,244 @@ export default function RestaurantMenu() {
 
   if (restaurant && restaurant.approvalStatus !== "approved") {
     return (
-      <div className="container my-5">
-        <div className="alert alert-warning text-center">
-          <h4>Restaurant Not Approved</h4>
-          <p>Your restaurant must be approved by admin before you can manage your menu.</p>
-          <p>Current status: <strong>{restaurant.approvalStatus}</strong></p>
+      <div className="restaurant-menu-container">
+        <div className="restaurant-menu-wrapper">
+          <div className="menu-empty-state">
+            <BsClipboard size={64} />
+            <h3>Restaurant Not Approved</h3>
+            <p>Your restaurant must be approved by admin before you can manage your menu.</p>
+            <div className="approval-status-notice">
+              <small>
+                Current status: {restaurant.approvalStatus?.toUpperCase()}
+              </small>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container my-5">
-      <div className="row mb-4">
-        <div className="col">
-          <h2>
-            <BsClipboard className="me-2" />
+    <div className="restaurant-menu-container">
+      <div className="restaurant-menu-wrapper">
+        {/* Header Section */}
+        <div className="menu-header">
+          <h1>
+            <BsClipboard />
             Menu Management
-          </h2>
-        </div>
-        <div className="col text-end">
-          <button
-            className="btn btn-primary me-2"
-            onClick={() => navigate("/restaurant/dashboard")}
-          >
-            <BsArrowLeft className="me-1" />
-            Back
-          </button>
-          <button
-            className="btn btn-success"
-            onClick={() => {
-              resetForm();
-              setShowForm(true);
-            }}
-          >
-            <BsPlus className="me-1" />
-            Add New Item
-          </button>
-        </div>
-      </div>
-
-      {error && <div className="alert alert-danger">{error}</div>}
-
-      {showForm && (
-        <div className="card shadow-lg mb-4">
-          <div className="card-header bg-info text-white">
-            <h5 className="mb-0">
-              {editingId ? (
-                <>
-                  <BsPencil className="me-2" />
-                  Edit Item
-                </>
-              ) : (
-                <>
-                  <BsPlus className="me-2" />
-                  Add New Item
-                </>
-              )}
-            </h5>
+          </h1>
+          <div className="menu-stats">
+            <div className="menu-stat-item">
+              <span className="menu-stat-value">{menuItems.length}</span>
+              <span className="menu-stat-label">Total Items</span>
+            </div>
+            <div className="menu-stat-item">
+              <span className="menu-stat-value">{menuItems.filter(item => item.isAvailable).length}</span>
+              <span className="menu-stat-label">Available</span>
+            </div>
+            <button
+              className="add-item-button"
+              onClick={() => {
+                resetForm();
+                setShowForm(true);
+              }}
+            >
+              <BsPlus />
+              Add New Item
+            </button>
           </div>
-          <div className="card-body">
-            <form onSubmit={handleSubmit}>
-              <div className="row">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Item Name *</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Enter item name"
-                    required
-                  />
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Price (₹) *</label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    placeholder="0.00"
-                    step="0.01"
-                    required
-                  />
-                </div>
-              </div>
+        </div>
 
-              <div className="row">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Category *</label>
-                  <select
-                    className="form-control"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Select category</option>
-                    <option value="Appetizers">Appetizers</option>
-                    <option value="Main Course">Main Course</option>
-                    <option value="Side Dishes">Side Dishes</option>
-                    <option value="Desserts">Desserts</option>
-                    <option value="Beverages">Beverages</option>
-                    <option value="Breads">Breads</option>
-                  </select>
+        {/* Error Display */}
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
+
+        {/* Menu Items Grid */}
+        {menuItems.length > 0 ? (
+          <div className="menu-items-grid">
+            {menuItems.map((item) => (
+              <div key={item._id} className="menu-item-card">
+                <div className="menu-item-status available">
+                  {item.isAvailable ? "Available" : "Unavailable"}
                 </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Preparation Time (mins) *</label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    name="preparationTime"
-                    value={formData.preparationTime}
-                    onChange={handleChange}
-                    placeholder="15"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Description *</label>
-                <textarea
-                  className="form-control"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  rows="3"
-                  placeholder="Describe the dish"
-                  required
-                ></textarea>
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Image URL</label>
-                <input
-                  type="url"
-                  className="form-control"
-                  name="image"
-                  value={formData.image}
-                  onChange={handleChange}
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
-
-              <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button type="submit" className="btn btn-success">
-                  {editingId ? (
-                    <>
-                      <BsCheck className="me-1" />
-                      Update Item
-                    </>
+                <div className="menu-item-image">
+                  {item.image ? (
+                    <img src={item.image} alt={item.name} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
                   ) : (
-                    <>
-                      <BsCheck className="me-1" />
-                      Add Item
-                    </>
+                    <BsImage />
                   )}
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={resetForm}
-                >
-                  Cancel
+                </div>
+                <div className="menu-item-content">
+                  <div className="menu-item-header">
+                    <h3 className="menu-item-title">{item.name}</h3>
+                    <span className="menu-item-price">₹{item.price}</span>
+                  </div>
+                  <p className="menu-item-description">{item.description}</p>
+                  <div className="menu-item-meta">
+                    <span className="menu-item-category">{item.category}</span>
+                    <div className="menu-item-rating">
+                      <BsStar />
+                      {item.rating || 0} ({item.totalRatings || 0})
+                    </div>
+                  </div>
+                  <div className="menu-item-actions">
+                    <button
+                      className="menu-item-action-btn edit"
+                      onClick={() => handleEdit(item)}
+                      title="Edit item"
+                    >
+                      <BsPencil />
+                    </button>
+                    <button
+                      className="menu-item-action-btn delete"
+                      onClick={() => handleDelete(item._id)}
+                      title="Delete item"
+                    >
+                      <BsTrash />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="menu-empty-state">
+            <BsClipboard size={64} />
+            <h3>No menu items yet</h3>
+            <p>Start building your menu by adding your first delicious dish!</p>
+            <button
+              className="add-item-button"
+              onClick={() => {
+                resetForm();
+                setShowForm(true);
+              }}
+            >
+              <BsPlus />
+              Add Your First Item
+            </button>
+          </div>
+        )}
+
+        {/* Add/Edit Form Modal */}
+        {showForm && (
+          <div className="menu-form-overlay">
+            <div className="menu-form-container">
+              <div className="menu-form-header">
+                <h2>
+                  {editingId ? <BsPencil /> : <BsPlus />}
+                  {editingId ? "Edit Menu Item" : "Add New Menu Item"}
+                </h2>
+                <button className="menu-form-close" onClick={resetForm}>
+                  <BsX />
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
 
-      {menuItems.length > 0 ? (
-        <div className="card shadow-lg">
-          <div className="card-header bg-primary text-white">
-            <h5 className="mb-0">Menu Items ({menuItems.length})</h5>
-          </div>
-          <div className="card-body">
-            <div className="table-responsive">
-              <table className="table table-hover">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Prep Time</th>
-                    <th>Rating</th>
-                    <th>Available</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {menuItems.map((item) => (
-                    <tr key={item._id}>
-                      <td>
-                        <strong>{item.name}</strong>
-                        <br />
-                        <small className="text-muted">
-                          {item.description.substring(0, 50)}...
-                        </small>
-                      </td>
-                      <td>
-                        <span className="badge bg-info">
-                          {item.category}
-                        </span>
-                      </td>
-                      <td>
-                        <strong>₹{item.price}</strong>
-                      </td>
-                      <td>{item.preparationTime} mins</td>
-                      <td>
-                        <BsStar className="me-1" />
-                        {item.rating || 0} ({item.totalRatings || 0})
-                      </td>
-                      <td>
-                        <span
-                          className={`badge bg-${
-                            item.isAvailable ? "success" : "danger"
-                          }`}
-                        >
-                          {item.isAvailable ? "Available" : "Not Available"}
-                        </span>
-                      </td>
-                      <td>
-                        <button
-                          className="btn btn-sm btn-primary me-2"
-                          onClick={() => handleEdit(item)}
-                        >
-                          <BsPencil />
-                        </button>
-                        <button
-                          className="btn btn-sm btn-danger"
-                          onClick={() => handleDelete(item._id)}
-                        >
-                          <BsTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <form onSubmit={handleSubmit}>
+                <div className="menu-form-grid">
+                  <div className="form-group">
+                    <label className="form-label">Item Name *</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="Enter dish name"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Price (₹) *</label>
+                    <input
+                      type="number"
+                      className="form-input"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleChange}
+                      placeholder="0.00"
+                      step="0.01"
+                      min="0"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Category *</label>
+                    <select
+                      className="form-select"
+                      name="category"
+                      value={formData.category}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select category</option>
+                      <option value="Appetizers">Appetizers</option>
+                      <option value="Main Course">Main Course</option>
+                      <option value="Side Dishes">Side Dishes</option>
+                      <option value="Desserts">Desserts</option>
+                      <option value="Beverages">Beverages</option>
+                      <option value="Breads">Breads</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Preparation Time (mins) *</label>
+                    <input
+                      type="number"
+                      className="form-input"
+                      name="preparationTime"
+                      value={formData.preparationTime}
+                      onChange={handleChange}
+                      placeholder="15"
+                      min="1"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group" style={{gridColumn: '1 / -1'}}>
+                    <label className="form-label">Description *</label>
+                    <textarea
+                      className="form-textarea"
+                      name="description"
+                      value={formData.description}
+                      onChange={handleChange}
+                      placeholder="Describe the dish, ingredients, and any special notes"
+                      rows="4"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group" style={{gridColumn: '1 / -1'}}>
+                    <label className="form-label">Image URL</label>
+                    <input
+                      type="url"
+                      className="form-input"
+                      name="image"
+                      value={formData.image}
+                      onChange={handleChange}
+                      placeholder="https://example.com/dish-image.jpg"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-actions">
+                  <button type="button" className="form-cancel-btn" onClick={resetForm}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="form-submit-btn">
+                    <BsCheck style={{marginRight: '0.5rem'}} />
+                    {editingId ? "Update Item" : "Add Item"}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
-        </div>
-      ) : (
-        <div className="alert alert-info text-center">
-          <h5>No menu items yet</h5>
-          <p>Start by adding your first dish!</p>
-          <button
-            className="btn btn-success"
-            onClick={() => setShowForm(true)}
-          >
-            <BsPlus className="me-1" />
-            Add First Item
-          </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

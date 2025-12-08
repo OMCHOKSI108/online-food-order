@@ -244,9 +244,9 @@ router.put("/:id/cancel", verifyToken, async (req, res) => {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
-    // Can only cancel pending or accepted orders
-    if (!["pending", "accepted"].includes(order.status)) {
-      return res.status(400).json({ message: "Cannot cancel this order" });
+    // Can only cancel pending, accepted, or confirmed orders (before preparation starts)
+    if (!["pending", "accepted", "confirmed"].includes(order.status)) {
+      return res.status(400).json({ message: "Cannot cancel this order - it may already be in preparation or out for delivery" });
     }
 
     // Issue refund if payment was completed
@@ -258,6 +258,11 @@ router.put("/:id/cancel", verifyToken, async (req, res) => {
         refundStatus: "completed"
       });
 
+      // Update user stats (decrement since order is cancelled)
+      await User.findByIdAndUpdate(req.user.id, {
+        $inc: { totalOrders: -1, totalSpent: -order.totalAmount }
+      });
+
       res.json({
         message: "Order cancelled and refund initiated",
         refundAmount: `₹${order.totalAmount}`,
@@ -266,6 +271,11 @@ router.put("/:id/cancel", verifyToken, async (req, res) => {
     } else {
       await Order.findByIdAndUpdate(req.params.id, {
         status: "cancelled"
+      });
+
+      // Update user stats (decrement since order is cancelled)
+      await User.findByIdAndUpdate(req.user.id, {
+        $inc: { totalOrders: -1, totalSpent: -order.totalAmount }
       });
 
       res.json({

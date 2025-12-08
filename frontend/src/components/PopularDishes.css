@@ -1,104 +1,264 @@
 .popular-dishes {
-  background: white;
-  padding: 60px 0;
-  width: 100%;
+  background: linear-gradient(135deg, var(--secondary-50) 0%, white 100%);
+  padding: var(--spacing-3xl) 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.popular-dishes::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(14,165,233,0.03)"/><circle cx="75" cy="75" r="1" fill="rgba(14,165,233,0.03)"/><circle cx="50" cy="10" r="0.5" fill="rgba(14,165,233,0.02)"/><circle cx="10" cy="50" r="0.5" fill="rgba(14,165,233,0.02)"/><circle cx="90" cy="30" r="0.5" fill="rgba(14,165,233,0.02)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 var(--spacing-lg);
+  position: relative;
+  z-index: 1;
 }
 
 .popular-dishes h2 {
   text-align: center;
   font-size: 2.5rem;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 40px;
+  font-weight: 700;
+  color: var(--secondary-900);
+  margin-bottom: var(--spacing-2xl);
+  position: relative;
+}
+
+.popular-dishes h2::after {
+  content: '';
+  position: absolute;
+  bottom: -var(--spacing-md);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+  border-radius: var(--radius-full);
 }
 
 .carousel-container {
   position: relative;
+  background: white;
+  border-radius: var(--radius-2xl);
+  padding: var(--spacing-2xl);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--secondary-200);
 }
 
 .carousel {
   display: flex;
-  gap: 20px;
+  gap: var(--spacing-lg);
   overflow-x: auto;
   scroll-behavior: smooth;
-  padding: 20px 0;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  padding: var(--spacing-md) 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .carousel::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
 }
 
 .dish-item {
   flex: 0 0 auto;
   text-align: center;
-  width: 150px;
+  width: 160px;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  position: relative;
+}
+
+.dish-item:hover {
+  transform: translateY(-8px) scale(1.05);
 }
 
 .dish-item img {
   width: 120px;
   height: 120px;
-  border-radius: 50%;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-normal);
   object-fit: cover;
+  border: 3px solid white;
+  position: relative;
+  z-index: 2;
 }
 
 .dish-item:hover img {
-  transform: translateY(-5px);
+  transform: rotate(5deg);
+  box-shadow: var(--shadow-2xl);
+  border-color: var(--primary-200);
+}
+
+.dish-item::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 140px;
+  height: 140px;
+  background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
+  border-radius: var(--radius-xl);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.dish-item:hover::before {
+  opacity: 0.3;
 }
 
 .dish-item p {
-  margin-top: 10px;
+  margin-top: var(--spacing-lg);
   font-size: 1.1rem;
-  color: #666;
-  font-weight: 500;
+  color: var(--secondary-700);
+  font-weight: 600;
+  text-transform: capitalize;
+  position: relative;
+  z-index: 3;
 }
 
 .arrow {
   position: absolute;
-  right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #f0f0f0;
-  border: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  color: #333;
-  font-size: 1.2rem;
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, white, var(--secondary-50));
+  border: 2px solid var(--secondary-200);
+  box-shadow: var(--shadow-lg);
+  color: var(--secondary-600);
+  font-size: 1.5rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.3s ease;
+  transition: all var(--transition-normal);
+  z-index: 10;
 }
 
 .arrow:hover {
-  background: #e0e0e0;
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+  color: white;
+  border-color: var(--primary-500);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: var(--shadow-2xl);
 }
 
 .arrow.left {
-  right: 60px;
+  left: var(--spacing-lg);
+}
+
+.arrow.right {
+  right: var(--spacing-lg);
 }
 
 .arrow:focus {
   outline: none;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+}
+
+/* Floating elements for visual interest */
+.popular-dishes::after {
+  content: '';
+  position: absolute;
+  top: var(--spacing-3xl);
+  right: var(--spacing-3xl);
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
+  border-radius: var(--radius-full);
+  opacity: 0.1;
+  z-index: 0;
+}
+
+.popular-dishes .container::before {
+  content: '';
+  position: absolute;
+  bottom: var(--spacing-3xl);
+  left: var(--spacing-3xl);
+  width: 150px;
+  height: 150px;
+  background: linear-gradient(135deg, var(--accent-100), var(--accent-200));
+  border-radius: var(--radius-full);
+  opacity: 0.1;
+  z-index: 0;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .popular-dishes {
+    padding: var(--spacing-2xl) 0;
+  }
+
   .popular-dishes h2 {
     font-size: 2rem;
+    margin-bottom: var(--spacing-xl);
   }
+
+  .carousel-container {
+    padding: var(--spacing-lg);
+    margin: 0 calc(-1 * var(--spacing-md));
+  }
+
+  .dish-item {
+    width: 140px;
+  }
+
+  .dish-item img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .dish-item p {
+    font-size: 1rem;
+  }
+
+  .arrow {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .arrow.left {
+    left: var(--spacing-sm);
+  }
+
+  .arrow.right {
+    right: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .popular-dishes h2 {
+    font-size: 1.75rem;
+  }
+
+  .dish-item {
+    width: 120px;
+  }
+
+  .dish-item img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .carousel-container {
+    padding: var(--spacing-md);
+  }
+}
 
   .dish-item {
     width: 120px;
@@ -122,7 +282,7 @@
   .arrow.left {
     right: 50px;
   }
-}
+
 
 @media (max-width: 480px) {
   .popular-dishes {

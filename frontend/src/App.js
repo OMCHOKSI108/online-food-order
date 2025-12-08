@@ -24,6 +24,7 @@ import RestaurantDashboard from "./pages/restaurant/Dashboard";
 import RestaurantMenu from "./pages/restaurant/Menu";
 import RestaurantOrders from "./pages/restaurant/Orders";
 import RestaurantSetup from "./pages/restaurant/Setup";
+import AddDish from "./pages/restaurant/AddDish";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -144,12 +145,20 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/restaurant/add-dish"
+              element={
+                <ProtectedRoute requiredRole="restaurant">
+                  <AddDish />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Admin Routes */}
             <Route
               path="/admin/dashboard"
               element={
-                <ProtectedRoute requiredRole="admin">
+                <ProtectedRoute requiredRole={["admin", "superadmin"]}>
                   <AdminDashboard />
                 </ProtectedRoute>
               }
@@ -157,7 +166,7 @@ function App() {
             <Route
               path="/admin/restaurants"
               element={
-                <ProtectedRoute requiredRole="admin">
+                <ProtectedRoute requiredRole={["admin", "superadmin"]}>
                   <AdminRestaurants />
                 </ProtectedRoute>
               }
@@ -165,7 +174,7 @@ function App() {
             <Route
               path="/admin/users"
               element={
-                <ProtectedRoute requiredRole="admin">
+                <ProtectedRoute requiredRole={["admin", "superadmin"]}>
                   <AdminUsers />
                 </ProtectedRoute>
               }
@@ -173,7 +182,7 @@ function App() {
             <Route
               path="/admin/users/:userId"
               element={
-                <ProtectedRoute requiredRole="admin">
+                <ProtectedRoute requiredRole={["admin", "superadmin"]}>
                   <AdminUserDetail />
                 </ProtectedRoute>
               }
@@ -181,7 +190,7 @@ function App() {
             <Route
               path="/admin/reports"
               element={
-                <ProtectedRoute requiredRole="admin">
+                <ProtectedRoute requiredRole={["admin", "superadmin"]}>
                   <AdminReports />
                 </ProtectedRoute>
               }
@@ -189,7 +198,7 @@ function App() {
             <Route
               path="/admin/orders"
               element={
-                <ProtectedRoute requiredRole="admin">
+                <ProtectedRoute requiredRole={["admin", "superadmin"]}>
                   <AdminOrders />
                 </ProtectedRoute>
               }

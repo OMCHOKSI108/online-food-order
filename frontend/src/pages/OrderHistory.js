@@ -54,7 +54,8 @@ export default function OrderHistory() {
       loadOrders(); // Reload orders to reflect the change
     } catch (error) {
       console.error("Error cancelling order:", error);
-      alert("Failed to cancel order. Please try again.");
+      const errorMessage = error.response?.data?.message || "Failed to cancel order. Please try again.";
+      alert(errorMessage);
     } finally {
       setCancellingOrderId(null);
     }
@@ -99,7 +100,7 @@ export default function OrderHistory() {
   };
 
   const canCancelOrder = (status) => {
-    return ['pending', 'accepted'].includes(status.toLowerCase());
+    return ['pending', 'accepted', 'confirmed'].includes(status.toLowerCase());
   };
 
   useEffect(() => {

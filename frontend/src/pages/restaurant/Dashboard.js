@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import restaurantService from "../../services/restaurantService";
 import { GiForkKnifeSpoon } from "react-icons/gi";
-import { BsClipboard, BsBox, BsStar, BsCheck, BsX, BsPlus, BsGear, BsGraphUp, BsFileText, BsBarChart, BsClock } from "react-icons/bs";
+import { BsClipboard, BsBox, BsStar, BsCheck, BsX, BsPlus, BsGear, BsGraphUp, BsFileText, BsBarChart, BsClock, BsCurrencyRupee, BsPeople, BsShop, BsArrowUp, BsGeoAlt, BsPhone, BsEnvelope } from "react-icons/bs";
+import "./RestaurantDashboard.css";
 
 export default function RestaurantDashboard() {
   const navigate = useNavigate();
@@ -30,10 +31,11 @@ export default function RestaurantDashboard() {
 
   if (loading) {
     return (
-      <div className="container my-5">
-        <div className="text-center">
-          <div className="spinner-border" role="status">
-            <span className="visually-hidden">Loading...</span>
+      <div className="restaurant-admin-container">
+        <div className="restaurant-admin-wrapper">
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+            <p>Loading your restaurant dashboard...</p>
           </div>
         </div>
       </div>
@@ -42,35 +44,37 @@ export default function RestaurantDashboard() {
 
   if (error) {
     return (
-      <div className="container my-5">
-        <div className="alert alert-danger">{error}</div>
-        <button
-          className="btn btn-primary"
-          onClick={() => navigate("/restaurant/setup")}
-        >
-          Setup Restaurant
-        </button>
+      <div className="restaurant-admin-container">
+        <div className="restaurant-admin-wrapper">
+          <div className="error-state">
+            <BsX size={64} />
+            <h3>Unable to Load Dashboard</h3>
+            <p>{error}</p>
+            <button
+              className="action-button primary"
+              onClick={() => navigate("/restaurant/setup")}
+            >
+              Setup Restaurant
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (restaurant && restaurant.approvalStatus === "pending") {
     return (
-      <div className="container my-5">
-        <div className="row justify-content-center">
-          <div className="col-md-6 text-center">
-            <div className="card shadow">
-              <div className="card-body p-5">
-                <BsClock className="text-warning mb-3" size={64} />
-                <h3>Restaurant Registration Pending</h3>
-                <p className="text-muted">
-                  Your restaurant registration is under review by our admin team.
-                  You will be notified once it's approved and your dashboard becomes active.
-                </p>
-                <div className="mt-4">
-                  <small className="text-muted">Submitted on: {new Date(restaurant.createdAt).toLocaleDateString()}</small>
-                </div>
-              </div>
+      <div className="restaurant-admin-container">
+        <div className="restaurant-admin-wrapper">
+          <div className="pending-state">
+            <BsClock size={80} />
+            <h2>Restaurant Registration Pending</h2>
+            <p>
+              Your restaurant registration is under review by our admin team.
+              You will be notified once it's approved and your dashboard becomes active.
+            </p>
+            <div className="pending-meta">
+              <small>Submitted on: {new Date(restaurant.createdAt).toLocaleDateString()}</small>
             </div>
           </div>
         </div>
@@ -88,209 +92,216 @@ export default function RestaurantDashboard() {
   };
 
   return (
-    <div className="container-fluid my-4">
-      <div className="row mb-4">
-        <div className="col">
-          <h2>
-            <GiForkKnifeSpoon className="me-2" />
+    <div className="restaurant-admin-container">
+      <div className="restaurant-admin-wrapper">
+        {/* Header Section */}
+        <div className="restaurant-header">
+          <h1>
+            <GiForkKnifeSpoon />
             Restaurant Dashboard
-          </h2>
+          </h1>
+          {restaurant && (
+            <div className={`restaurant-status status-${restaurant.approvalStatus}`}>
+              <BsCheck />
+              {restaurant.approvalStatus?.toUpperCase()}
+            </div>
+          )}
         </div>
-        <div className="col text-end">
-          <button
-            className="btn btn-primary me-2"
-            onClick={() => navigate("/restaurant/menu")}
-          >
-            <BsClipboard className="me-1" />
-            Manage Menu
-          </button>
-          <button
-            className="btn btn-success"
-            onClick={() => navigate("/restaurant/orders")}
-          >
-            <BsBox className="me-1" />
-            View Orders
-          </button>
-        </div>
-      </div>
 
-      {restaurant && (
-        <>
-          <div className="row mb-4">
-            <div className="col-md-8">
-              <div className="card shadow-lg">
-                <div className="card-body">
-                  <h4>{restaurant.name}</h4>
-                  <p className="text-muted">{restaurant.description}</p>
-                  <p>
-                    <strong>Address:</strong> {restaurant.address}
-                  </p>
-                  <p>
-                    <strong>Status:</strong>{" "}
-                    <span
-                      className={`badge bg-${getApprovalBadge(
-                        restaurant.approvalStatus
-                      )}`}
-                    >
-                      {restaurant.approvalStatus?.toUpperCase()}
-                    </span>
-                  </p>
+        {restaurant && (
+          <>
+            {/* Stats Cards Grid */}
+            <div className="restaurant-stats-grid">
+              <div className="stat-card revenue">
+                <div className="stat-card-icon">
+                  <BsCurrencyRupee />
+                </div>
+                <div className="stat-card-value">₹{restaurant.totalEarnings || 0}</div>
+                <div className="stat-card-label">Total Earnings</div>
+                <div className="stat-card-change positive">
+                  <BsArrowUp />
+                  +12% from last month
+                </div>
+              </div>
 
-                  {restaurant.approvalStatus === "rejected" && (
-                    <div className="alert alert-danger mt-3">
-                      <strong>Rejection Reason:</strong>{" "}
-                      {restaurant.rejectionReason}
+              <div className="stat-card orders">
+                <div className="stat-card-icon">
+                  <BsBox />
+                </div>
+                <div className="stat-card-value">{restaurant.totalOrders || 0}</div>
+                <div className="stat-card-label">Total Orders</div>
+                <div className="stat-card-change positive">
+                  <BsArrowUp />
+                  +8% from last month
+                </div>
+              </div>
+
+              <div className="stat-card rating">
+                <div className="stat-card-icon">
+                  <BsStar />
+                </div>
+                <div className="stat-card-value">
+                  {restaurant.rating || 0}
+                  <BsStar style={{fontSize: '1rem', marginLeft: '0.25rem'}} />
+                </div>
+                <div className="stat-card-label">Average Rating</div>
+                <div className="stat-card-change positive">
+                  <BsArrowUp />
+                  +0.2 from last month
+                </div>
+              </div>
+
+              <div className="stat-card status">
+                <div className="stat-card-icon">
+                  {restaurant.isActive ? <BsCheck /> : <BsX />}
+                </div>
+                <div className="stat-card-value">
+                  {restaurant.isActive ? "Active" : "Inactive"}
+                </div>
+                <div className="stat-card-label">Restaurant Status</div>
+              </div>
+            </div>
+
+            {/* Main Content Grid */}
+            <div className="restaurant-content-grid">
+              {/* Restaurant Info Card */}
+              <div className="restaurant-info-card">
+                <div className="restaurant-info-header">
+                  <div className="restaurant-info-avatar">
+                    {restaurant.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="restaurant-info-details">
+                    <h3>{restaurant.name}</h3>
+                    <p>{restaurant.description}</p>
+                  </div>
+                </div>
+
+                <div className="restaurant-info-meta">
+                  <div className="info-meta-item">
+                    <BsGeoAlt />
+                    <div>
+                      <div className="info-meta-label">Address</div>
+                      <div className="info-meta-value">{restaurant.address}</div>
                     </div>
-                  )}
+                  </div>
+                  <div className="info-meta-item">
+                    <BsPhone />
+                    <div>
+                      <div className="info-meta-label">Phone</div>
+                      <div className="info-meta-value">{restaurant.phone || "Not provided"}</div>
+                    </div>
+                  </div>
+                  <div className="info-meta-item">
+                    <BsEnvelope />
+                    <div>
+                      <div className="info-meta-label">Email</div>
+                      <div className="info-meta-value">{restaurant.email || "Not provided"}</div>
+                    </div>
+                  </div>
+                  <div className="info-meta-item">
+                    <BsShop />
+                    <div>
+                      <div className="info-meta-label">Category</div>
+                      <div className="info-meta-value">{restaurant.category || "Not specified"}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="col-md-4">
-              <div className="card shadow-lg">
-                <div className="card-header bg-info text-white">
-                  <h6 className="mb-0">Rating & Performance</h6>
+              {/* Quick Actions Card */}
+              <div className="quick-actions-card">
+                <div className="quick-actions-header">
+                  <BsGear />
+                  <h4>Quick Actions</h4>
                 </div>
-                <div className="card-body text-center">
-                  <h3 className="text-warning">
-                    <BsStar className="me-1" />
-                    {restaurant.rating || 0}
-                  </h3>
-                  <p className="text-muted">Customer Rating</p>
-                  <hr />
-                  <p>
-                    <strong>Total Orders:</strong> {restaurant.totalOrders}
-                  </p>
-                  <p>
-                    <strong>Total Earnings:</strong> ₹
-                    {restaurant.totalEarnings || 0}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+                <div className="quick-actions-grid">
+                  <Link to="/restaurant/add-dish" className="action-button primary">
+                    <div className="action-button-icon">
+                      <BsPlus />
+                    </div>
+                    <div>
+                      <div style={{fontWeight: '600'}}>Add New Dish</div>
+                      <small style={{opacity: '0.9'}}>Expand your menu</small>
+                    </div>
+                  </Link>
 
-          <div className="row mb-4">
-            <div className="col-md-3">
-              <div className="card text-center shadow">
-                <div className="card-body">
-                  <h2 className="text-success">₹{restaurant.totalEarnings || 0}</h2>
-                  <p className="text-muted">Total Earnings</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div className="card text-center shadow">
-                <div className="card-body">
-                  <h2 className="text-primary">{restaurant.totalOrders}</h2>
-                  <p className="text-muted">Total Orders</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div className="card text-center shadow">
-                <div className="card-body">
-                  <h2 className="text-warning">
-                    <BsStar className="me-1" />
-                    {restaurant.rating || 0}
-                  </h2>
-                  <p className="text-muted">Rating</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div className="card text-center shadow">
-                <div className="card-body">
-                  <h2 className="text-info">
-                    {restaurant.isActive ? <BsCheck className="text-success" /> : <BsX className="text-danger" />}
-                  </h2>
-                  <p className="text-muted">
-                    {restaurant.isActive ? "Active" : "Inactive"}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+                  <Link to="/restaurant/menu" className="action-button secondary">
+                    <div className="action-button-icon">
+                      <BsFileText />
+                    </div>
+                    <div>
+                      <div style={{fontWeight: '600'}}>Edit Menu</div>
+                      <small style={{opacity: '0.9'}}>Update existing items</small>
+                    </div>
+                  </Link>
 
-          <div className="row mb-4">
-            <div className="col-md-6">
-              <div className="card shadow-lg">
-                <div className="card-header bg-success text-white">
-                  <h5 className="mb-0">
-                    <BsClipboard className="me-2" />
-                    Quick Actions
-                  </h5>
-                </div>
-                <div className="card-body d-grid gap-2">
-                  <Link to="/restaurant/menu" className="btn btn-success">
-                    <BsPlus className="me-1" />
-                    Add New Dish
+                  <Link to="/restaurant/orders" className="action-button warning">
+                    <div className="action-button-icon">
+                      <BsBox />
+                    </div>
+                    <div>
+                      <div style={{fontWeight: '600'}}>View Orders</div>
+                      <small style={{opacity: '0.9'}}>Manage incoming orders</small>
+                    </div>
                   </Link>
-                  <Link to="/restaurant/menu" className="btn btn-info">
-                    <BsFileText className="me-1" />
-                    Edit Menu
-                  </Link>
-                  <Link to="/restaurant/orders" className="btn btn-warning">
-                    <BsBox className="me-1" />
-                    Incoming Orders
-                  </Link>
-                  <button className="btn btn-outline-primary">
-                    <BsBarChart className="me-1" />
-                    View Analytics
-                  </button>
-                  <button className="btn btn-outline-secondary">
-                    <BsGear className="me-1" />
-                    Settings
+
+                  <button className="action-button">
+                    <div className="action-button-icon">
+                      <BsBarChart />
+                    </div>
+                    <div>
+                      <div style={{fontWeight: '600'}}>View Analytics</div>
+                      <small style={{opacity: '0.9'}}>Performance insights</small>
+                    </div>
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="col-md-6">
-              <div className="card shadow-lg">
-                <div className="card-header bg-primary text-white">
-                  <h5 className="mb-0">
-                    <BsGraphUp className="me-2" />
-                    This Month
-                  </h5>
+            {/* Performance Card */}
+            <div className="performance-card">
+              <div className="performance-header">
+                <BsGraphUp />
+                <h4>This Month's Performance</h4>
+              </div>
+              <div className="performance-metrics">
+                <div className="performance-metric">
+                  <div className="performance-metric-value">{restaurant.totalOrders || 0}</div>
+                  <div className="performance-metric-label">Orders</div>
                 </div>
-                <div className="card-body">
-                  <p>
-                    <strong>Orders:</strong> {restaurant.totalOrders || 0}
-                  </p>
-                  <p>
-                    <strong>Revenue:</strong> ₹{restaurant.totalEarnings || 0}
-                  </p>
-                  <p>
-                    <strong>Avg Rating:</strong> <BsStar className="me-1" />
-                    {restaurant.rating || 0}
-                  </p>
-                  <p>
-                    <strong>Status:</strong>{" "}
-                    <span
-                      className={`badge bg-${getApprovalBadge(
-                        restaurant.approvalStatus
-                      )}`}
-                    >
-                      {restaurant.approvalStatus?.toUpperCase()}
-                    </span>
-                  </p>
+                <div className="performance-metric">
+                  <div className="performance-metric-value">₹{restaurant.totalEarnings || 0}</div>
+                  <div className="performance-metric-label">Revenue</div>
+                </div>
+                <div className="performance-metric">
+                  <div className="performance-metric-value">
+                    {restaurant.rating || 0} <BsStar style={{fontSize: '0.75rem'}} />
+                  </div>
+                  <div className="performance-metric-label">Rating</div>
+                </div>
+                <div className="performance-metric">
+                  <div className="performance-metric-value">
+                    {restaurant.approvalStatus === "approved" ? "Active" : "Pending"}
+                  </div>
+                  <div className="performance-metric-label">Status</div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {recentOrders.length > 0 && (
-            <div className="card shadow-lg">
-              <div className="card-header bg-info text-white">
-                <h5 className="mb-0">
-                  <BsBox className="me-2" />
-                  Recent Orders
-                </h5>
-              </div>
-              <div className="card-body">
+            {/* Recent Orders Section */}
+            {recentOrders.length > 0 && (
+              <div className="recent-orders-card">
+                <div className="recent-orders-header">
+                  <h4>
+                    <BsBox />
+                    Recent Orders
+                  </h4>
+                  <Link to="/restaurant/orders" className="action-button secondary" style={{padding: '0.5rem 1rem', fontSize: '0.875rem'}}>
+                    View All
+                  </Link>
+                </div>
                 <div className="table-responsive">
-                  <table className="table table-hover">
+                  <table className="order-table">
                     <thead>
                       <tr>
                         <th>Order ID</th>
@@ -303,17 +314,11 @@ export default function RestaurantDashboard() {
                     <tbody>
                       {recentOrders.slice(0, 5).map((order) => (
                         <tr key={order._id}>
-                          <td>{order._id.substring(0, 8)}</td>
-                          <td>{order.customer?.name}</td>
+                          <td>#{order._id.substring(0, 8)}</td>
+                          <td>{order.customer?.name || "N/A"}</td>
                           <td>₹{order.totalAmount}</td>
                           <td>
-                            <span
-                              className={`badge bg-${
-                                order.status === "delivered"
-                                  ? "success"
-                                  : "warning"
-                              }`}
-                            >
+                            <span className={`order-status ${order.status}`}>
                               {order.status}
                             </span>
                           </td>
@@ -325,14 +330,11 @@ export default function RestaurantDashboard() {
                     </tbody>
                   </table>
                 </div>
-                <Link to="/restaurant/orders" className="btn btn-primary">
-                  View All Orders
-                </Link>
               </div>
-            </div>
-          )}
-        </>
-      )}
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
