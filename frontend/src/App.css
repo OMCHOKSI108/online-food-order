@@ -1,11 +1,17 @@
 /* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
+/* Ensure fonts load properly */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 /* Modern SaaS App Styles */
 body {
   background: linear-gradient(135deg, var(--secondary-50) 0%, var(--secondary-100) 100%);
   min-height: 100vh;
-  font-family: var(--font-family-sans);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
 }
 
 /* Enhanced Navbar Styles */
@@ -180,16 +186,17 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
-  color: white;
-  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+  color: white !important;
+  box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.25) !important;
+  border: none !important;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+  background: linear-gradient(135deg, #0284c7, #0369a1) !important;
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-  color: white;
+  box-shadow: 0 8px 25px -5px rgba(14, 165, 233, 0.4) !important;
+  color: white !important;
 }
 
 .btn-success {
