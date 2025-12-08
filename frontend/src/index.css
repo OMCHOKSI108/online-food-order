@@ -114,9 +114,28 @@
   --z-tooltip: 1070;
 }
 
-/* Global Styles */
-* {
-  box-sizing: border-box;
+/* Form Elements */
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  resize: vertical;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Ensure proper text rendering */
+input, textarea, select {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 html {
