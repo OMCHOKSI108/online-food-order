@@ -29,6 +29,11 @@ This Online Food Ordering System is designed to connect customers with local res
 - **Comprehensive Analytics**: Detailed reporting and performance metrics
 - **Mobile-Responsive**: Optimized for all device types
 
+### Live Demo
+
+- **Frontend Application**: [https://foodplaza-choksi.netlify.app/](https://foodplaza-choksi.netlify.app/)
+- **Backend API**: [https://online-food-order-oq52.onrender.com/](https://online-food-order-oq52.onrender.com/)
+
 ### Use Cases
 
 1. **For Customers**:
